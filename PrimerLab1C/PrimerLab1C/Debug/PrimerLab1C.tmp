@@ -1,0 +1,55 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.8</VERSION>
+ <DEVICE>"ATmega328P"</DEVICE>
+ <WORKING_DIR>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc</FILE>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\Debug\PrimerLab1C.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>PrimerLab1C.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>PrimerLab1C.map</FILE>
+  <FILE>PrimerLab1C.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <SETUP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>25</LINE></SETUP>
+  <MAIN_LOOP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>93</LINE></MAIN_LOOP>
+  <boton_1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>130</LINE></boton_1>
+  <boton_2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>152</LINE></boton_2>
+  <boton_3><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>174</LINE></boton_3>
+  <boton_4><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>196</LINE></boton_4>
+  <boton_5><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>217</LINE></boton_5>
+  <Delay><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>232</LINE></Delay>
+  <Exit_1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>148</LINE></Exit_1>
+  <Soltar_1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>136</LINE></Soltar_1>
+  <COMFIRM_INC_CT1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>145</LINE></COMFIRM_INC_CT1>
+  <MOSTRAR_LEDS_CT1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>244</LINE></MOSTRAR_LEDS_CT1>
+  <Exit_2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>170</LINE></Exit_2>
+  <Soltar_2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>158</LINE></Soltar_2>
+  <COMFIRM_DEC_CT1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>167</LINE></COMFIRM_DEC_CT1>
+  <Exit_3><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>192</LINE></Exit_3>
+  <Soltar_3><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>180</LINE></Soltar_3>
+  <COMFIRM_INC_CT2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>189</LINE></COMFIRM_INC_CT2>
+  <MOSTRAR_LEDS_CT2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>254</LINE></MOSTRAR_LEDS_CT2>
+  <Exit_4><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>214</LINE></Exit_4>
+  <Soltar_4><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>202</LINE></Soltar_4>
+  <COMFIRM_DEC_CT2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>211</LINE></COMFIRM_DEC_CT2>
+  <Exit_5><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>229</LINE></Exit_5>
+  <Soltar_5><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>223</LINE></Soltar_5>
+  <MOSTRAR_LEDS_SUMA><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>268</LINE></MOSTRAR_LEDS_SUMA>
+  <D1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>234</LINE></D1>
+  <D2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>236</LINE></D2>
+  <NO_CARRY4><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\PrimerLab1C\PrimerLab1C\main.asm</FILE><LINE>288</LINE></NO_CARRY4>
+ </LABELS>
+</ASSEMBLER_INFO>

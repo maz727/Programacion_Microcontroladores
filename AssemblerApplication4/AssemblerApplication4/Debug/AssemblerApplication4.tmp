@@ -1,0 +1,39 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.8</VERSION>
+ <DEVICE>"ATmega328P"</DEVICE>
+ <WORKING_DIR>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc</FILE>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\Debug\AssemblerApplication4.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>AssemblerApplication4.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>AssemblerApplication4.map</FILE>
+  <FILE>AssemblerApplication4.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <TABLA_7SEG><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>22</LINE></TABLA_7SEG>
+  <SETUP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>55</LINE></SETUP>
+  <SETUP_STACK><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>46</LINE></SETUP_STACK>
+  <MAIN_LOOP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>96</LINE></MAIN_LOOP>
+  <CONT_C100MS><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>173</LINE></CONT_C100MS>
+  <MUESTRA_R16_DISPLAY><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>201</LINE></MUESTRA_R16_DISPLAY>
+  <boton_1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>132</LINE></boton_1>
+  <boton_2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>149</LINE></boton_2>
+  <B1_WAIT_RELEASE><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>134</LINE></B1_WAIT_RELEASE>
+  <B2_WAIT_RELEASE><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>151</LINE></B2_WAIT_RELEASE>
+  <CONTOVERFLOWS><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>180</LINE></CONTOVERFLOWS>
+  <YAHUBOOVERFLOW><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\AssemblerApplication4\AssemblerApplication4\main.asm</FILE><LINE>182</LINE></YAHUBOOVERFLOW>
+ </LABELS>
+</ASSEMBLER_INFO>

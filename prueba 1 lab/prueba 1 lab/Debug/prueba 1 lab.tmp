@@ -1,0 +1,32 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.8</VERSION>
+ <DEVICE>"ATmega328P"</DEVICE>
+ <WORKING_DIR>C:\Users\Dylan Mazariegos M\Desktop\Github\prueba 1 lab\prueba 1 lab\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\prueba 1 lab\prueba 1 lab\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc</FILE>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328pdef.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\prueba 1 lab\prueba 1 lab\Debug\prueba 1 lab.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>prueba 1 lab.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>prueba 1 lab.map</FILE>
+  <FILE>prueba 1 lab.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <START><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\prueba 1 lab\prueba 1 lab\main.asm</FILE><LINE>12</LINE></START>
+  <MAIN_LOOP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\prueba 1 lab\prueba 1 lab\main.asm</FILE><LINE>24</LINE></MAIN_LOOP>
+  <DELAY><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\prueba 1 lab\prueba 1 lab\main.asm</FILE><LINE>29</LINE></DELAY>
+  <D1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\prueba 1 lab\prueba 1 lab\main.asm</FILE><LINE>32</LINE></D1>
+  <D2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\prueba 1 lab\prueba 1 lab\main.asm</FILE><LINE>34</LINE></D2>
+ </LABELS>
+</ASSEMBLER_INFO>

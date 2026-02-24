@@ -1,0 +1,38 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.8</VERSION>
+ <DEVICE>"ATmega328P"</DEVICE>
+ <WORKING_DIR>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc</FILE>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\Debug\Lab3A.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>Lab3A.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>Lab3A.map</FILE>
+  <FILE>Lab3A.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <sol_inc><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>13</LINE></sol_inc>
+  <sol_dec><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>14</LINE></sol_dec>
+  <RESET><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>31</LINE></RESET>
+  <INT_boton1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>141</LINE></INT_boton1>
+  <INT_boton2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>147</LINE></INT_boton2>
+  <INT_TIMER0><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>153</LINE></INT_TIMER0>
+  <SETUP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>39</LINE></SETUP>
+  <MOSTRAR_LEDS><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>133</LINE></MOSTRAR_LEDS>
+  <MAIN_LOOP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>101</LINE></MAIN_LOOP>
+  <DECREMENTO><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>114</LINE></DECREMENTO>
+  <FINAL_LOOP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github\Lab3A\Lab3A\main.asm</FILE><LINE>127</LINE></FINAL_LOOP>
+ </LABELS>
+</ASSEMBLER_INFO>
