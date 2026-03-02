@@ -1,0 +1,99 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.8</VERSION>
+ <DEVICE>"ATmega328P"</DEVICE>
+ <WORKING_DIR>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc</FILE>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\Debug\Proyecto_reloj.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>Proyecto_reloj.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>Proyecto_reloj.map</FILE>
+  <FILE>Proyecto_reloj.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <hora><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>15</LINE></hora>
+  <mins><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>16</LINE></mins>
+  <secs><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>17</LINE></secs>
+  <flag_1s><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>18</LINE></flag_1s>
+  <sec_dec><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>20</LINE></sec_dec>
+  <sec_unid><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>21</LINE></sec_unid>
+  <min_dec><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>22</LINE></min_dec>
+  <min_unid><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>23</LINE></min_unid>
+  <hora_dec><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>24</LINE></hora_dec>
+  <hora_unid><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>25</LINE></hora_unid>
+  <estado><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>27</LINE></estado>
+  <hh_inc_ev><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>28</LINE></hh_inc_ev>
+  <hh_dec_ev><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>29</LINE></hh_dec_ev>
+  <mm_inc_ev><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>30</LINE></mm_inc_ev>
+  <mm_dec_ev><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>31</LINE></mm_dec_ev>
+  <cambio_modo_ev><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>32</LINE></cambio_modo_ev>
+  <ultimo_pinc><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>33</LINE></ultimo_pinc>
+  <SETUP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>52</LINE></SETUP>
+  <ISR_PCINT1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>615</LINE></ISR_PCINT1>
+  <ISR_TM1_COMPA><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>605</LINE></ISR_TM1_COMPA>
+  <UPDATE_MIN_DIGITS><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>414</LINE></UPDATE_MIN_DIGITS>
+  <UPDATE_HORA_DIGITS><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>433</LINE></UPDATE_HORA_DIGITS>
+  <MAIN_LOOP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>187</LINE></MAIN_LOOP>
+  <REFRESH_HHMM><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>566</LINE></REFRESH_HHMM>
+  <NO_MODO><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>211</LINE></NO_MODO>
+  <GUARDAR_ESTADO><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>206</LINE></GUARDAR_ESTADO>
+  <DELAY_PEQUE><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>593</LINE></DELAY_PEQUE>
+  <IR_ESTADO_0><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>235</LINE></IR_ESTADO_0>
+  <IR_ESTADO_1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>236</LINE></IR_ESTADO_1>
+  <IR_ESTADO_2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>237</LINE></IR_ESTADO_2>
+  <IR_ESTADO_3><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>238</LINE></IR_ESTADO_3>
+  <IR_ESTADO_4><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>239</LINE></IR_ESTADO_4>
+  <ESTADO_0><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>244</LINE></ESTADO_0>
+  <ESTADO_1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>300</LINE></ESTADO_1>
+  <ESTADO_2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>305</LINE></ESTADO_2>
+  <ESTADO_3><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>398</LINE></ESTADO_3>
+  <ESTADO_4><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>403</LINE></ESTADO_4>
+  <GUARDAR_SEC><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>294</LINE></GUARDAR_SEC>
+  <GUARDAR_MIN><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>288</LINE></GUARDAR_MIN>
+  <GUARDAR_HORA><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>282</LINE></GUARDAR_HORA>
+  <REVISAR_HH_DEC><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>328</LINE></REVISAR_HH_DEC>
+  <GUARDAR_HH_INC><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>323</LINE></GUARDAR_HH_INC>
+  <REVISAR_MM_INC><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>352</LINE></REVISAR_MM_INC>
+  <HH_DEC_NORMAL><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>342</LINE></HH_DEC_NORMAL>
+  <GUARDAR_HH_DEC><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>345</LINE></GUARDAR_HH_DEC>
+  <REVISAR_MM_DEC><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>371</LINE></REVISAR_MM_DEC>
+  <GUARDAR_MM_INC><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>366</LINE></GUARDAR_MM_INC>
+  <FINAL_ESTADO_2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>392</LINE></FINAL_ESTADO_2>
+  <MM_DEC_NORMAL><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>385</LINE></MM_DEC_NORMAL>
+  <GUARDAR_MM_DEC><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>388</LINE></GUARDAR_MM_DEC>
+  <MIN_LOOP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>419</LINE></MIN_LOOP>
+  <MIN_DONE><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>426</LINE></MIN_DONE>
+  <H_LOOP><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>437</LINE></H_LOOP>
+  <H_DONE><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>444</LINE></H_DONE>
+  <LIMPIAR_SEG><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>451</LINE></LIMPIAR_SEG>
+  <MOSTRAR_DIGITO><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>462</LINE></MOSTRAR_DIGITO>
+  <D0><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>487</LINE></D0>
+  <D1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>496</LINE></D1>
+  <D2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>501</LINE></D2>
+  <D3><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>509</LINE></D3>
+  <D4><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>517</LINE></D4>
+  <D5><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>524</LINE></D5>
+  <D6><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>532</LINE></D6>
+  <D7><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>541</LINE></D7>
+  <D8><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>547</LINE></D8>
+  <D9><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>557</LINE></D9>
+  <SD1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>596</LINE></SD1>
+  <REVISAR_PC0><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>636</LINE></REVISAR_PC0>
+  <REVISAR_PC1><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>643</LINE></REVISAR_PC1>
+  <REVISAR_PC2><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>650</LINE></REVISAR_PC2>
+  <REVISAR_PC3><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>657</LINE></REVISAR_PC3>
+  <PCINT_YA><FILE>C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm</FILE><LINE>664</LINE></PCINT_YA>
+ </LABELS>
+</ASSEMBLER_INFO>
