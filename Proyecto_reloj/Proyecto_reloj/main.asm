@@ -1,9 +1,9 @@
 /*
-* NombreProgra.asm
+* Proyecto_reloj.asm
 *
-* Creado: 
-* Autor : 
-* Descripción: 
+* Creado: 02/03/2026
+* Autor : Dylan Mazariegos 22986
+* Descripción: Proyecto de clase en Assembler utilizando Arduino Nano:Reloj
 */
 /****************************************/
 // Encabezado (Definición de Registros, Variables y Constantes)
@@ -30,7 +30,27 @@ hh_dec_ev:		.byte 1		;PC1
 mm_inc_ev:		.byte 1		;PC2
 mm_dec_ev:		.byte 1		;PC3
 cambio_modo_ev:	.byte 1		;PC4
-ultimo_pinc:	.byte 1
+ultimo_pinc:	.byte 1		;Variable en la ram para el ultimo estado de pin C 
+
+dia:			.byte 1		;Variable en la Ram para el dia 
+mes:			.byte 1		;Variable en la Ram para el mes 
+dia_dec:		.byte 1		;Variable en la ram para decenas de dia
+dia_unid:		.byte 1		;Variable en la ram para unidades de dia
+mes_dec:		.byte 1		;Variable en la ram para decenas de mes
+mes_unid:		.byte 1		;Variable en la ram para unidades de mes 
+
+alarm_hora:      .byte 1    ;Variable en la ram para la hora de la alarma
+alarm_mins:      .byte 1    ;Variable en la ram para los minutos de la alarma
+
+alarm_hora_dec:  .byte 1    ;Variable en la ram para las decenas de hora alarma
+alarm_hora_unid: .byte 1    ;Variable en la ram para las unidades de hora alarma
+alarm_min_dec:   .byte 1    ;Variable en la ram para las decenas de min alarma
+alarm_min_unid:  .byte 1    ;Variable en la ram para las unidades de min alarma
+
+alarm_on:		 .byte 1	;Variable en la ram para verificar si la alarma esta encendida o no 
+
+parpadeo_led:	 .byte 1	;Variable en la ram para el parpadeo de los leds | Timer 0
+
 .cseg
 
 //=========Tabla de vectores=============//
@@ -39,7 +59,9 @@ ultimo_pinc:	.byte 1
 .org 0x0008
 	RJMP ISR_PCINT1			;Vector de interrupcion por pin change puerto C
 .org 0x0016
-	RJMP ISR_TM1_COMPA		;Vector de interrupcion Timer_1/Compare Match A
+	RJMP ISR_TM1_COMPA		;Vector de interrupcion Timer_1 | Compare Match A
+.org 0x001C
+	RJMP ISR_TM0_COMPA		;Vector de interrupcion Timer_0 | Compare Match A
 .org 0x0100
  /****************************************/
 // Configuración de la pila
@@ -98,32 +120,32 @@ SETUP:
 
 	//Salidas de los transistores para controlar el multiplexado de los displays 
 	
-	SBI DDRB, DDB0		;Configuro el como salida bit0, puerto B
+	SBI DDRB, DDB0		;Configuro como salida bit0, puerto B
 	CBI PORTB, PORTB0	; Limpio el bit 0 para que empiece apagado
 
-	SBI DDRB, DDB1		;Configuro el como salida bit1, puerto B
+	SBI DDRB, DDB1		;Configuro como salida bit1, puerto B
 	CBI PORTB, PORTB1	; Limpio el bit 1 para que empiece apagado
 
-	SBI DDRB, DDB2		;Configuro el como salida bit2, puerto B
+	SBI DDRB, DDB2		;Configuro como salida bit2, puerto B
 	CBI PORTB, PORTB2	; Limpio el bit 2 para que empiece apagado
 
-	SBI DDRB, DDB3		;Configuro el como salida bit3, puerto B
+	SBI DDRB, DDB3		;Configuro como salida bit3, puerto B
 	CBI PORTB, PORTB3	; Limpio el bit 3 para que empiece apagado
 
 
-	//Salida leds indicadores 
-
-	
-
 	//Salida- Buzzer
+
+	SBI DDRB,DDB5
+	CBI PORTB, PORTB5
+
+	//Salida leds indicadores | Parpadeantes
 	SBI DDRC, DDC5		;Configuro el como salida bit5, puerto C
 	CBI PORTC, PORTC5	; Limpio el bit 5 para que empiece apagado
 
-	;
-
-
+	
 //==================Configuracion inicializacion de variables============================//
-
+	
+	//Variables de tiempo 
 	LDI r16, 0
 	STS hora,    r16
 	STS mins,    r16
@@ -132,7 +154,17 @@ SETUP:
 
 	STS estado,	 r16
 
+	//Variables de fecha
+	LDI r16, 1
+	STS dia, r16
+	LDI r16, 1
+	STS mes, r16
+	
+	RCALL UPDATE_DIA_DIGITS
+	RCALL UPDATE_MES_DIGITS
+
 	//Limpiar eventos
+	LDI r16, 0
 	STS hh_inc_ev, r16		
 	STS hh_dec_ev, r16
 	STS mm_inc_ev, r16
@@ -145,6 +177,33 @@ SETUP:
 	RCALL UPDATE_MIN_DIGITS
 	RCALL UPDATE_HORA_DIGITS
 
+	//Variables alarma
+	LDI r16, 0
+	STS alarm_hora, r16
+	STS alarm_mins, r16
+	STS alarm_on,	r16
+
+	RCALL UPDATE_ALARMA_HORA_DIGITS
+	RCALL UPDATE_ALARMA_MIN_DIGITS
+
+	//Variables leds
+	LDI r16, 0
+	STS parpadeo_led, r16
+
+//==================Configuracion Timer_0 | Leds parpadeantes======================================//
+
+	LDI r16, (1<<WGM01)				 ; modo CTC
+	OUT TCCR0A, r16
+	
+	LDI r16, (1<<CS02) | (1<<CS00)	; prescaler 1024
+	OUT TCCR0B, r16
+
+	LDI r16, 156					; valor para ~10ms aprox
+	OUT OCR0A, r16
+
+	LDI r16, (1<<OCIE0A)			; habilitar interrupción compare A
+	STS TIMSK0, r16
+	
 //==================Configuracion Timer_1| Modo CTC======================================//
 
 	LDI r16, 0
@@ -177,16 +236,10 @@ SETUP:
 
 	//Activo las interrupciones globales 
 	SEI
-	//C0nfiuracion de interrupciones por pinchange 
-
-
-
-    
+	
 /****************************************/
 // Loop Infinito
 MAIN_LOOP:
-
-	rcall REFRESH_HHMM
 	
 //=============Flag de de modos del reloj============//
 	LDS R16, cambio_modo_ev	;Leer evento 
@@ -243,6 +296,8 @@ MAIN_LOOP:
 	//Corazon | Este lee la flag y inicia el conteo de los segundos
 	ESTADO_0:
 
+	rcall REFRESH_HHMM	;Mostrar la hora estado 0
+
 	LDI R16, 0
     STS hh_inc_ev, R16
     STS hh_dec_ev, R16
@@ -278,31 +333,42 @@ MAIN_LOOP:
     CPI  R16, 24
     BRLO GUARDAR_HORA
     LDI  R16, 0
+	rcall INCREMENTAR_FECHA
+
 
 	GUARDAR_HORA:
 	STS  hora, R16
-    RCALL UPDATE_HORA_DIGITS
-    RCALL UPDATE_MIN_DIGITS
+
+    RCALL UPDATE_HORA_DIGITS		;Llama a la rutina para actualizar el valor de la hora en los displays
+    RCALL UPDATE_MIN_DIGITS			;Llama a la rutina para actualizar el valor de los minutos en los displays
+	RCALL REVISAR_ALARMA			;Llama a la rutina para comparar el valor configurado en modo_0 y modo_4
     RJMP MAIN_LOOP
 
 	GUARDAR_MIN:
 	STS mins, r16
 
 	RCALL UPDATE_MIN_DIGITS   
+	RCALL REVISAR_ALARMA			;Llama a la rutina para comparar el valor configurado en modo_0 y modo_4
 	RJMP MAIN_LOOP
 
 	GUARDAR_SEC:
 	STS secs, r16
+
+	RCALL REVISAR_ALARMA			;Llama a la rutina para comparar el valor configurado en modo_0 y modo_4
 	
 	RJMP MAIN_LOOP
 
 //=============Estado 1 | Mostrar Fecha====================//
 	ESTADO_1:
 
+	rcall REFRESH_DDMM		;Llama a la rutina para mostrar la fecha
+
     RJMP MAIN_LOOP
 
 //=============Estado 2 | Configurar Hora====================//
 	ESTADO_2:
+
+	rcall REFRESH_HHMM		;Mostrar la hora mientras se configura 
 
 	//Incremento y decremento de horas 
 	
@@ -397,11 +463,166 @@ MAIN_LOOP:
 //=============Estado 3 | Configurar Fecha====================//
 	ESTADO_3:
 
+	rcall REFRESH_DDMM		;Mostrar la fecha mientras se configura 
+
+	//Incremento y decremento de dia
+
+	;Incremento 
+	LDS  r16, hh_inc_ev
+    CPI  r16, 1
+    BRNE REVISAR_DIA_DEC
+
+    LDI  r16, 0
+    STS  hh_inc_ev, r16        ; limpiar evento
+
+    RCALL INC_DIA              ; Llama la rutina de incrementar dia 
+    RCALL UPDATE_DIA_DIGITS
+
+
+	;Decremento
+	REVISAR_DIA_DEC:
+	
+	LDS  r16, hh_dec_ev
+    CPI  r16, 1
+    BRNE REVISAR_MES_INC
+
+    LDI  r16, 0
+    STS  hh_dec_ev, r16        ; Limpiar evento
+
+    RCALL DEC_DIA              ; Llama la rutina de decrementar dia 
+    RCALL UPDATE_DIA_DIGITS
+
+	//Incremento y decremento de meses 
+
+	;Incremento 
+	REVISAR_MES_INC:
+	LDS  r16, mm_inc_ev
+    CPI  r16, 1
+    BRNE REVISAR_MES_DEC
+
+    LDI  r16, 0
+    STS  mm_inc_ev, r16			; limpiar evento
+
+    RCALL INC_MES				; Llama la rutina de incrementar mes
+    RCALL AJUSTAR_DIA_POR_MES	; Llama una rutina que ajusta los dias al mes que toca 
+    RCALL UPDATE_MES_DIGITS		; Llama la rutina de actualizar el valor de el mes 
+    RCALL UPDATE_DIA_DIGITS		; LLama a la rutina de actualizar el valor de los dias
+
+	;Decremento 
+	REVISAR_MES_DEC:
+	LDS  r16, mm_dec_ev
+    CPI  r16, 1
+    BRNE FINAL_ESTADO_3
+
+    LDI  r16, 0
+    STS  mm_dec_ev, r16        ; limpiar evento
+
+    RCALL DEC_MES              ; mes--
+    RCALL AJUSTAR_DIA_POR_MES
+    RCALL UPDATE_MES_DIGITS
+    RCALL UPDATE_DIA_DIGITS
+
+	FINAL_ESTADO_3:
+    RJMP MAIN_LOOP
+
+
+
     RJMP MAIN_LOOP
 
 //=============Estado 4 | Configurar Alarma ====================//
 	ESTADO_4:
 
+	RCALL REFRESH_ALARMA
+	LDI r16, 1
+	STS alarm_on, r16
+	//Incremento y decremento de hora de la alarma
+	
+	;Incremento 
+    LDS  r16, hh_inc_ev
+    CPI  r16, 1
+    BRNE REVISAR_ALARMA_HH_DEC
+
+    LDI  r16, 0
+    STS  hh_inc_ev, r16
+
+    LDS  r16, alarm_hora
+    INC  r16
+    CPI  r16, 24
+    BRLO GUARDAR_ALARMA_HH_INC
+    LDI  r16, 0
+
+	GUARDAR_ALARMA_HH_INC:
+    STS  alarm_hora, r16
+    RCALL UPDATE_ALARMA_HORA_DIGITS
+
+
+    ;Decremento 
+	REVISAR_ALARMA_HH_DEC:
+    LDS  r16, hh_dec_ev
+    CPI  r16, 1
+    BRNE REVISAR_ALARMA_MM_INC
+
+    LDI  r16, 0
+    STS  hh_dec_ev, r16
+
+    LDS  r16, alarm_hora
+    CPI  r16, 0
+    BRNE ALARMA_HH_DEC_NORMAL
+    LDI  r16, 23
+    RJMP GUARDAR_ALARMA_HH_DEC
+
+	ALARMA_HH_DEC_NORMAL:
+    DEC  r16
+
+	GUARDAR_ALARMA_HH_DEC:
+    STS  alarm_hora, r16
+    RCALL UPDATE_ALARMA_HORA_DIGITS
+
+	//Incremento y decremento de minutos de la alarma 
+	
+	;Incremento 
+	REVISAR_ALARMA_MM_INC:
+    LDS  r16, mm_inc_ev
+    CPI  r16, 1
+    BRNE REVISAR_ALARMA_MM_DEC
+
+    LDI  r16, 0
+    STS  mm_inc_ev, r16
+
+    LDS  r16, alarm_mins
+    INC  r16
+    CPI  r16, 60
+    BRLO GUARDAR_ALARMA_MM_INC
+    LDI  r16, 0
+
+	GUARDAR_ALARMA_MM_INC:
+    STS  alarm_mins, r16
+    RCALL UPDATE_ALARMA_MIN_DIGITS
+
+
+    ;Decremento minutos alarma
+	REVISAR_ALARMA_MM_DEC:
+    LDS  r16, mm_dec_ev
+    CPI  r16, 1
+    BRNE FINAL_ESTADO_4
+
+    LDI  r16, 0
+    STS  mm_dec_ev, r16
+
+    LDS  r16, alarm_mins
+    CPI  r16, 0
+    BRNE ALARMA_MM_DEC_NORMAL
+    LDI  r16, 59
+    RJMP GUARDAR_ALARMA_MM_DEC
+
+	ALARMA_MM_DEC_NORMAL:
+    DEC  r16
+
+	GUARDAR_ALARMA_MM_DEC:
+    STS  alarm_mins, r16
+    RCALL UPDATE_ALARMA_MIN_DIGITS
+
+	FINAL_ESTADO_4:
     RJMP MAIN_LOOP
 
 /****************************************/
@@ -411,7 +632,7 @@ MAIN_LOOP:
 
 	//Convertir min----> Decenas/Unidades 
 
-	UPDATE_MIN_DIGITS:	;Sb1
+	UPDATE_MIN_DIGITS:	
 
     LDS R16, mins     
     CLR R17           
@@ -448,7 +669,7 @@ MAIN_LOOP:
 
 	//Rutina para dibujar un digito 0 a 9 
 
-	LIMPIAR_SEG:		;Sb3
+	LIMPIAR_SEG:		
 
 	CBI PORTB, PORTB4     ; A
     CBI PORTD, PORTD2     ; B
@@ -459,7 +680,7 @@ MAIN_LOOP:
     CBI PORTD, PORTD7     ; G
     RET
 
-	MOSTRAR_DIGITO:		;SB4
+	MOSTRAR_DIGITO:		
 	rcall LIMPIAR_SEG
 
 	CPI R16, 0
@@ -598,6 +819,366 @@ SD1:
     BRNE SD1
     RET
 
+	//=============Estado 1 | Mostrar Fecha ====================//
+
+	//Convertir dia----> Decenas/Unidades 
+	UPDATE_DIA_DIGITS:
+	LDS R16, dia
+    CLR R17
+
+	DIA_LOOP:
+    CPI R16, 10
+    BRLO DIA_YA
+    SUBI R16, 10
+    INC R17
+    RJMP DIA_LOOP
+
+	DIA_YA:
+    STS dia_dec, R17
+    STS dia_unid, R16
+    RET
+
+	//Convertir mes----> Decenas/Unidades 
+	
+	UPDATE_MES_DIGITS:
+    LDS R16, mes
+    CLR R17
+
+	MES_LOOP:
+    CPI R16, 10
+    BRLO MES_YA
+    SUBI R16, 10
+    INC R17
+    RJMP MES_LOOP
+
+	MES_YA:
+    STS mes_dec, R17
+    STS mes_unid, R16
+    RET
+
+	//Rutina para mostrar el valor de la fecha en los displays 
+	REFRESH_DDMM:
+
+    LDS R16, dia_dec
+    RCALL MOSTRAR_DIGITO
+    SBI  PORTB, PORTB0
+    RCALL DELAY_PEQUE
+    CBI  PORTB, PORTB0		;PB0 a las decenas de dia 
+
+    LDS R16, dia_unid
+    RCALL MOSTRAR_DIGITO
+    SBI  PORTB, PORTB1
+    RCALL DELAY_PEQUE
+    CBI  PORTB, PORTB1		;PB1 a las unidades de dia
+
+    LDS R16, mes_dec
+    RCALL MOSTRAR_DIGITO
+    SBI  PORTB, PORTB2
+    RCALL DELAY_PEQUE
+    CBI  PORTB, PORTB2		;PB2 a las decenas de mes
+
+    LDS R16, mes_unid
+    RCALL MOSTRAR_DIGITO
+    SBI  PORTB, PORTB3
+    RCALL DELAY_PEQUE
+    CBI  PORTB, PORTB3		;PB3 a las unidades de mes 
+
+    RET
+
+//-----------------------Rutina numeros de meses------------------//
+;==================== Configuracion de la fecha dependiendo el mes ====================
+; Vuelve en r18 el máximo de días del mes actual basicmaente clasifica en que mes esta para que cuente bien los dias del mes
+
+GET_MAX_DIAS_DEL_MES:
+
+	PUSH r16
+	LDS r16, mes
+	LDI r18, 31
+
+	CPI r16, 2 ;Si es febrero ve a la cuenta de el mes de febrero
+	BREQ _MAX28
+	CPI r16, 4 ;Si es abril ve a la cuenta de el mes de abril
+	BREQ _MAX30
+	CPI r16, 6 ;Si es junio ve a la cuenta de el mes de junio
+	BREQ _MAX30
+	CPI r16, 9 ;Si es septiembre ve a la cuenta del mes de septiembre
+	BREQ _MAX30
+	CPI r16, 11 ;Si es noviembre ve a la cuenta del mes de noviembre
+	BREQ _MAX30
+	RJMP _MAX_FIN
+	
+	_MAX28:
+	LDI r18, 28
+	RJMP _MAX_FIN
+	_MAX30:
+	LDI r18, 30
+	_MAX_FIN:
+	POP r16
+	RET
+	
+	; Si dia > maxDia(mes) entonces dia = maxDia
+	AJUSTAR_DIA_POR_MES:
+	PUSH r16
+	PUSH r18
+	RCALL GET_MAX_DIAS_DEL_MES ; deja max en r18
+	LDS r16, dia
+	CP r16, r18
+	BRLO _AJ_OK
+	BREQ _AJ_OK
+	
+	; dia era mayor => recortar a max	
+	STS dia, r18
+	_AJ_OK:
+	POP r18
+	POP r16
+	RET
+	
+	; Incremento de dia (si pasa max => dia=1 y mes++)
+	INC_DIA:
+	PUSH r16
+	PUSH r18
+	RCALL GET_MAX_DIAS_DEL_MES
+	LDS r16, dia
+	INC r16
+	CP r16, r18
+	BRLO _ID_GUARDAR
+	BREQ _ID_GUARDAR
+	
+	; rollover
+	LDI r16, 1
+	STS dia, r16
+	RCALL INC_MES
+	POP r18
+	POP r16
+	RET
+
+	_ID_GUARDAR:
+	STS dia, r16
+	POP r18
+	POP r16
+	RET
+	
+	; Decremento de dia (si dia=1 => dia=max y mes--)
+	DEC_DIA:
+	PUSH r16
+	PUSH r18
+	LDS r16, dia
+	CPI r16, 1
+	BRNE _DD_NORMAL
+	
+	; rollover hacia atrás
+	RCALL DEC_MES
+	RCALL GET_MAX_DIAS_DEL_MES
+	STS dia, r18
+	POP r18
+	POP r16
+	RET
+	
+	_DD_NORMAL:
+	DEC r16
+	STS dia, r16
+	POP r18
+	POP r16
+	RET
+
+	; Incremento de mes con rollover 12->1
+	INC_MES:
+	PUSH r16
+	LDS r16, mes
+	INC r16
+	CPI r16, 13
+	BRLO _IM_GUARDAR
+	LDI r16, 1
+	_IM_GUARDAR:
+	STS mes, r16
+	POP r16
+	RET
+	
+	; Decremento de mes con rollover 1->12
+	DEC_MES:
+	PUSH r16
+	LDS r16, mes
+	CPI r16, 1
+	BRNE _DM_NORMAL
+	LDI r16, 12
+	RJMP _DM_GUARDAR
+	_DM_NORMAL:
+	DEC r16
+	_DM_GUARDAR:
+	STS mes, r16
+	POP r16
+	RET
+
+	//Rutina que incrementa la fecha cuando 23:59----->00:00 | Segun el mes//
+	INCREMENTAR_FECHA:
+	
+	PUSH r16
+	PUSH r17
+	PUSH r18
+
+	LDS  r16, dia
+    INC  r16
+    STS  dia, r16
+
+	LDS r17, mes 
+	LDI r18, 31		;Resto de meses con 31 dias 
+
+	CPI r17, 2
+	BREQ MAX_28		;Febrero 28 dias
+
+	CPI r17, 4		
+	BREQ MAX_30		;Abril 30 dias 
+
+	CPI r17, 6		
+	BREQ MAX_30		;Junio con 30 dias 
+
+	CPI r17, 9		
+	BREQ MAX_30		;Septiembre con 30 dias 
+
+	CPI r17, 11
+	BREQ MAX_30		;Noviembre con 30 dias 
+
+	RJMP REVISAR_DIA 
+
+
+	MAX_28:
+		LDI r18, 28
+	RJMP REVISAR_DIA
+	
+	MAX_30:
+		LDI r18, 30
+
+	REVISAR_DIA:
+	
+	LDS  r16, dia
+    CP   r18, r16       
+    BRLO ROLLOVER
+    RJMP FECHA_DIGITS
+
+	ROLLOVER:
+    LDI  r16, 1
+    STS  dia, r16
+
+    LDS  r16, mes
+    INC  r16
+    CPI  r16, 13
+    BRLO SAVE_M
+    LDI  r16, 1
+	SAVE_M:
+    STS  mes, r16
+
+	FECHA_DIGITS:
+    RCALL UPDATE_DIA_DIGITS
+    RCALL UPDATE_MES_DIGITS
+
+    POP  r18
+    POP  r17
+    POP  r16
+
+	RET	
+
+	//Rutina para la hora de la alarma 
+	UPDATE_ALARMA_HORA_DIGITS:
+    LDS R16, alarm_hora
+    CLR R17
+
+	ALARMA_H_LOOP:
+    CPI R16, 10
+    BRLO ALARMA_H_YA
+    SUBI R16, 10
+    INC R17
+    RJMP ALARMA_H_LOOP
+
+	ALARMA_H_YA:
+    STS alarm_hora_dec, R17
+    STS alarm_hora_unid, R16
+    RET
+
+	//Rutina para los minutos de la alarma 
+	UPDATE_ALARMA_MIN_DIGITS:
+    LDS R16, alarm_mins
+    CLR R17
+
+	ALARMA_M_LOOP:
+    CPI R16, 10
+    BRLO ALARMA_M_YA
+    SUBI R16, 10
+    INC R17
+    RJMP ALARMA_M_LOOP
+
+	ALARMA_M_YA:
+    STS alarm_min_dec, R17
+    STS alarm_min_unid, R16
+    RET
+
+	//Rutina para mostrar el valor de la alarma, basicamente es la misma que REFRESH_HHMM pero con las variables para la alarma 
+	REFRESH_ALARMA:
+	
+	//Parpadeo de displays en modo alarma 
+	LDS r16, parpadeo_led
+	CPI r16, 25				
+	BRLO MOSTRAR_ALARMA
+
+	; si es mayor ? NO mostrar (apagado)
+	RCALL LIMPIAR_SEG
+	CBI PORTB, PORTB0
+	CBI PORTB, PORTB1
+	CBI PORTB, PORTB2
+	CBI PORTB, PORTB3
+	RET
+
+	MOSTRAR_ALARMA:
+
+    LDS R16, alarm_hora_dec
+    RCALL MOSTRAR_DIGITO
+    SBI PORTB, PORTB0
+    RCALL DELAY_PEQUE
+    CBI PORTB, PORTB0			; PB0 decenas hora alarma
+
+    LDS R16, alarm_hora_unid
+    RCALL MOSTRAR_DIGITO
+    SBI PORTB, PORTB1
+    RCALL DELAY_PEQUE
+    CBI PORTB, PORTB1			; PB1 unidades hora alarma
+
+    LDS R16, alarm_min_dec
+    RCALL MOSTRAR_DIGITO
+    SBI PORTB, PORTB2
+    RCALL DELAY_PEQUE
+    CBI PORTB, PORTB2			 ; PB2 decenas min alarma
+
+    LDS R16, alarm_min_unid
+    RCALL MOSTRAR_DIGITO
+    SBI PORTB, PORTB3
+    RCALL DELAY_PEQUE
+    CBI PORTB, PORTB3			; PB3 unidades min alarma
+
+    RET
+
+	REVISAR_ALARMA:
+    ; primero revisar si la alarma está activada
+    LDS r16, alarm_on
+    CPI r16, 1
+    BRNE NO_ALARMA
+
+    ; comparar hora actual con hora de alarma
+    LDS r16, hora
+    LDS r17, alarm_hora
+    CP  r16, r17
+    BRNE NO_ALARMA
+
+    ; comparar minutos actuales con minutos de alarma
+    LDS r16, mins
+    LDS r17, alarm_mins
+    CP  r16, r17
+    BRNE NO_ALARMA
+
+    SBI PORTB, PORTB5
+    RET
+
+NO_ALARMA:
+    CBI PORTB, PORTB5
+    RET
 /****************************************/
 // Interrupt routines//
 
@@ -667,6 +1248,40 @@ ISR_PCINT1:
     POP  R17
     POP  R16
 RETI
+
+
+
+;Interrupcion del timer_0 para parpadear leds
+ISR_TM0_COMPA:
+	PUSH r16
+	IN   r16, SREG
+    PUSH r16
+    PUSH r17
+
+    LDS r16, parpadeo_led
+    INC r16
+    STS parpadeo_led, r16
+
+    CPI r16, 50
+    BRLO FIN_ISR_T0
+
+    LDI r16, 0
+    STS parpadeo_led, r16
+
+    
+	SBIC PORTC, PORTC5
+	RJMP APAGAR_LED_T0
+	SBI  PORTC, PORTC5
+	RJMP FIN_ISR_T0
+
+	APAGAR_LED_T0:
+	CBI  PORTC, PORTC5
+	FIN_ISR_T0:
+    POP  r17
+    POP  r16
+    OUT  SREG, r16
+    POP  r16
+    RETI
 /****************************************/
 
 

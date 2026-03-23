@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm Mon Mar 02 17:09:30 2026
+AVRASM ver. 2.2.8  C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm Wed Mar 18 08:10:46 2026
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontroladores\Proyecto_reloj\Proyecto_reloj\main.asm(10): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\M328PDEF.inc'
@@ -987,11 +987,11 @@ C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontrolador
                                  
                                  ; ***** END OF FILE ******************************************************
                                  
-                                 * NombreProgra.asm
+                                 * Proyecto_reloj.asm
                                  *
-                                 * Creado: 
-                                 * Autor : 
-                                 * Descripción: 
+                                 * Creado: 02/03/2026
+                                 * Autor : Dylan Mazariegos 22986
+                                 * Descripción: Proyecto de clase en Assembler utilizando Arduino Nano:Reloj
                                  */
                                  /****************************************/
                                  // Encabezado (Definición de Registros, Variables y Constantes)
@@ -1061,16 +1061,38 @@ C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontrolador
 00010d                           mm_inc_ev:		.byte 1		;PC2
 00010e                           mm_dec_ev:		.byte 1		;PC3
 00010f                           cambio_modo_ev:	.byte 1		;PC4
-000110                           ultimo_pinc:	.byte 1
+000110                           ultimo_pinc:	.byte 1		;Variable en la ram para el ultimo estado de pin C 
+                                 
+000111                           dia:			.byte 1		;Variable en la Ram para el dia 
+000112                           mes:			.byte 1		;Variable en la Ram para el mes 
+000113                           dia_dec:		.byte 1		;Variable en la ram para decenas de dia
+000114                           dia_unid:		.byte 1		;Variable en la ram para unidades de dia
+000115                           mes_dec:		.byte 1		;Variable en la ram para decenas de mes
+000116                           mes_unid:		.byte 1		;Variable en la ram para unidades de mes 
+                                 
+000117                           alarm_hora:      .byte 1    ;Variable en la ram para la hora de la alarma
+000118                           alarm_mins:      .byte 1    ;Variable en la ram para los minutos de la alarma
+                                 
+000119                           alarm_hora_dec:  .byte 1    ;Variable en la ram para las decenas de hora alarma
+00011a                           alarm_hora_unid: .byte 1    ;Variable en la ram para las unidades de hora alarma
+00011b                           alarm_min_dec:   .byte 1    ;Variable en la ram para las decenas de min alarma
+00011c                           alarm_min_unid:  .byte 1    ;Variable en la ram para las unidades de min alarma
+                                 
+00011d                           alarm_on:		 .byte 1	;Variable en la ram para verificar si la alarma esta encendida o no 
+                                 
+00011e                           parpadeo_led:	 .byte 1	;Variable en la ram para el parpadeo de los leds | Timer 0
+                                 
                                  .cseg
                                  
                                  //=========Tabla de vectores=============//
                                  .org 0x0000
 000000 c103                      	RJMP SETUP				;Vector de reset 
                                  .org 0x0008
-000008 c284                      	RJMP ISR_PCINT1			;Vector de interrupcion por pin change puerto C
+000008 c42d                      	RJMP ISR_PCINT1			;Vector de interrupcion por pin change puerto C
                                  .org 0x0016
-000016 c270                      	RJMP ISR_TM1_COMPA		;Vector de interrupcion Timer_1/Compare Match A
+000016 c419                      	RJMP ISR_TM1_COMPA		;Vector de interrupcion Timer_1 | Compare Match A
+                                 .org 0x001C
+00001c c443                      	RJMP ISR_TM0_COMPA		;Vector de interrupcion Timer_0 | Compare Match A
                                  .org 0x0100
                                   /****************************************/
                                  // Configuración de la pila
@@ -1129,311 +1151,510 @@ C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontrolador
                                  
                                  	//Salidas de los transistores para controlar el multiplexado de los displays 
                                  	
-00011d 9a20                      	SBI DDRB, DDB0		;Configuro el como salida bit0, puerto B
+00011d 9a20                      	SBI DDRB, DDB0		;Configuro como salida bit0, puerto B
 00011e 9828                      	CBI PORTB, PORTB0	; Limpio el bit 0 para que empiece apagado
                                  
-00011f 9a21                      	SBI DDRB, DDB1		;Configuro el como salida bit1, puerto B
+00011f 9a21                      	SBI DDRB, DDB1		;Configuro como salida bit1, puerto B
 000120 9829                      	CBI PORTB, PORTB1	; Limpio el bit 1 para que empiece apagado
                                  
-000121 9a22                      	SBI DDRB, DDB2		;Configuro el como salida bit2, puerto B
+000121 9a22                      	SBI DDRB, DDB2		;Configuro como salida bit2, puerto B
 000122 982a                      	CBI PORTB, PORTB2	; Limpio el bit 2 para que empiece apagado
                                  
-000123 9a23                      	SBI DDRB, DDB3		;Configuro el como salida bit3, puerto B
+000123 9a23                      	SBI DDRB, DDB3		;Configuro como salida bit3, puerto B
 000124 982b                      	CBI PORTB, PORTB3	; Limpio el bit 3 para que empiece apagado
                                  
                                  
-                                 	//Salida leds indicadores 
+                                 	//Salida- Buzzer
+                                 
+000125 9a25                      	SBI DDRB,DDB5
+000126 982d                      	CBI PORTB, PORTB5
+                                 
+                                 	//Salida leds indicadores | Parpadeantes
+000127 9a3d                      	SBI DDRC, DDC5		;Configuro el como salida bit5, puerto C
+000128 9845                      	CBI PORTC, PORTC5	; Limpio el bit 5 para que empiece apagado
                                  
                                  	
-                                 
-                                 	//Salida- Buzzer
-000125 9a3d                      	SBI DDRC, DDC5		;Configuro el como salida bit5, puerto C
-000126 9845                      	CBI PORTC, PORTC5	; Limpio el bit 5 para que empiece apagado
-                                 
-                                 	;
-                                 
-                                 
                                  //==================Configuracion inicializacion de variables============================//
+                                 	
+                                 	//Variables de tiempo 
+000129 e000                      	LDI r16, 0
+00012a 9300 0100                 	STS hora,    r16
+00012c 9300 0101                 	STS mins,    r16
+00012e 9300 0102                 	STS secs,	 r16
+000130 9300 0103                 	STS flag_1s, r16
                                  
-000127 e000                      	LDI r16, 0
-000128 9300 0100                 	STS hora,    r16
-00012a 9300 0101                 	STS mins,    r16
-00012c 9300 0102                 	STS secs,	 r16
-00012e 9300 0103                 	STS flag_1s, r16
+000132 9300 010a                 	STS estado,	 r16
                                  
-000130 9300 010a                 	STS estado,	 r16
+                                 	//Variables de fecha
+000134 e001                      	LDI r16, 1
+000135 9300 0111                 	STS dia, r16
+000137 e001                      	LDI r16, 1
+000138 9300 0112                 	STS mes, r16
+                                 	
+00013a d1e2                      	RCALL UPDATE_DIA_DIGITS
+00013b d1ee                      	RCALL UPDATE_MES_DIGITS
                                  
                                  	//Limpiar eventos
-000132 9300 010b                 	STS hh_inc_ev, r16		
-000134 9300 010c                 	STS hh_dec_ev, r16
-000136 9300 010d                 	STS mm_inc_ev, r16
-000138 9300 010e                 	STS mm_dec_ev, r16
-00013a 9300 010f                 	STS	cambio_modo_ev, r16
+00013c e000                      	LDI r16, 0
+00013d 9300 010b                 	STS hh_inc_ev, r16		
+00013f 9300 010c                 	STS hh_dec_ev, r16
+000141 9300 010d                 	STS mm_inc_ev, r16
+000143 9300 010e                 	STS mm_dec_ev, r16
+000145 9300 010f                 	STS	cambio_modo_ev, r16
                                  
-00013c b106                      	IN r16, PINC
-00013d 9300 0110                 	STS ultimo_pinc, r16
+000147 b106                      	IN r16, PINC
+000148 9300 0110                 	STS ultimo_pinc, r16
                                  
-00013f d0b7                      	RCALL UPDATE_MIN_DIGITS
-000140 d0c3                      	RCALL UPDATE_HORA_DIGITS
+00014a d142                      	RCALL UPDATE_MIN_DIGITS
+00014b d14e                      	RCALL UPDATE_HORA_DIGITS
                                  
+                                 	//Variables alarma
+00014c e000                      	LDI r16, 0
+00014d 9300 0117                 	STS alarm_hora, r16
+00014f 9300 0118                 	STS alarm_mins, r16
+000151 9300 011d                 	STS alarm_on,	r16
+                                 
+000153 d28b                      	RCALL UPDATE_ALARMA_HORA_DIGITS
+000154 d297                      	RCALL UPDATE_ALARMA_MIN_DIGITS
+                                 
+                                 	//Variables leds
+000155 e000                      	LDI r16, 0
+000156 9300 011e                 	STS parpadeo_led, r16
+                                 
+                                 //==================Configuracion Timer_0 | Leds parpadeantes======================================//
+                                 
+000158 e002                      	LDI r16, (1<<WGM01)				 ; modo CTC
+000159 bd04                      	OUT TCCR0A, r16
+                                 	
+00015a e005                      	LDI r16, (1<<CS02) | (1<<CS00)	; prescaler 1024
+00015b bd05                      	OUT TCCR0B, r16
+                                 
+00015c e90c                      	LDI r16, 156					; valor para ~10ms aprox
+00015d bd07                      	OUT OCR0A, r16
+                                 
+00015e e002                      	LDI r16, (1<<OCIE0A)			; habilitar interrupción compare A
+00015f 9300 006e                 	STS TIMSK0, r16
+                                 	
                                  //==================Configuracion Timer_1| Modo CTC======================================//
                                  
-000141 e000                      	LDI r16, 0
-000142 9300 0080                 	STS TCCR1A, r16
+000161 e000                      	LDI r16, 0
+000162 9300 0080                 	STS TCCR1A, r16
                                  
-000144 e00d                      	LDI r16, (1<<WGM12) | (1<<CS12) | (1<<CS10)		; Prescaler de 1024
-000145 9300 0081                 	STS TCCR1B, r16
+000164 e00d                      	LDI r16, (1<<WGM12) | (1<<CS12) | (1<<CS10)		; Prescaler de 1024
+000165 9300 0081                 	STS TCCR1B, r16
                                  
-000147 e30d                      	LDI R16, HIGH(15624)		;Cargar el valor 15624 a OCR1A
-000148 9300 0089                 	STS OCR1AH, R16
+000167 e30d                      	LDI R16, HIGH(15624)		;Cargar el valor 15624 a OCR1A
+000168 9300 0089                 	STS OCR1AH, R16
                                  
-00014a e008                      	LDI R16, LOW(15624)			;Cargar el valor 15624 a OCR1A
-00014b 9300 0088                 	STS OCR1AL, R16
+00016a e008                      	LDI R16, LOW(15624)			;Cargar el valor 15624 a OCR1A
+00016b 9300 0088                 	STS OCR1AL, R16
                                  
-00014d e000                      	LDI r16, 0x00				;Inicia en 0
-00014e 9300 0085                 	STS TCNT1H, r16
-000150 9300 0084                 	STS TCNT1L, r16
+00016d e000                      	LDI r16, 0x00				;Inicia en 0
+00016e 9300 0085                 	STS TCNT1H, r16
+000170 9300 0084                 	STS TCNT1L, r16
                                  
-000152 e002                      	LDI r16, (1<<OCIE1A)		;Habilitar interrupciones por compare match A
-000153 9300 006f                 	STS TIMSK1, r16
+000172 e002                      	LDI r16, (1<<OCIE1A)		;Habilitar interrupciones por compare match A
+000173 9300 006f                 	STS TIMSK1, r16
                                  
                                  	//Congifuracion de habilitacion de interrupciones por Pin-Change 
                                  
-000155 e012                      	LDI r17, (1<<PCIE1)
-000156 9310 0068                 	STS PCICR, r17																		;Habilito las interrupciones Pin Change del puerto C
+000175 e012                      	LDI r17, (1<<PCIE1)
+000176 9310 0068                 	STS PCICR, r17																		;Habilito las interrupciones Pin Change del puerto C
                                  
-000158 e11f                      	LDI R17, (1<<PCINT12) | (1<<PCINT11) | (1<<PCINT10) | (1<<PCINT9) | (1<<PCINT8)		;Habilito las interrupciones de Pin Change PC0-PC4
-000159 9310 006c                 	STS	PCMSK1, R17	
+000178 e11f                      	LDI R17, (1<<PCINT12) | (1<<PCINT11) | (1<<PCINT10) | (1<<PCINT9) | (1<<PCINT8)		;Habilito las interrupciones de Pin Change PC0-PC4
+000179 9310 006c                 	STS	PCMSK1, R17	
                                  														
                                  
                                  	//Activo las interrupciones globales 
-00015b 9478                      	SEI
-                                 	//C0nfiuracion de interrupciones por pinchange 
-                                 
-                                 
-                                 
-                                     
+00017b 9478                      	SEI
+                                 	
                                  /****************************************/
                                  // Loop Infinito
                                  MAIN_LOOP:
-                                 
-00015c d10d                      	rcall REFRESH_HHMM
                                  	
                                  //=============Flag de de modos del reloj============//
-00015d 9100 010f                 	LDS R16, cambio_modo_ev	;Leer evento 
-00015f 3001                      	CPI R16, 1
-000160 f461                      	BRNE NO_MODO
+00017c 9100 010f                 	LDS R16, cambio_modo_ev	;Leer evento 
+00017e 3001                      	CPI R16, 1
+00017f f461                      	BRNE NO_MODO
                                  
-000161 e000                      	LDI R16, 0
-000162 9300 010f                 	STS cambio_modo_ev, R16	;Limpiar evento
+000180 e000                      	LDI R16, 0
+000181 9300 010f                 	STS cambio_modo_ev, R16	;Limpiar evento
                                  
-000164 9100 010a                 	LDS R16, estado
-000166 9503                      	INC R16
+000183 9100 010a                 	LDS R16, estado
+000185 9503                      	INC R16
                                  
-000167 3005                      	CPI R16, 5
-000168 f008                      	BRLO GUARDAR_ESTADO
-000169 e000                      	LDI R16, 0
+000186 3005                      	CPI R16, 5
+000187 f008                      	BRLO GUARDAR_ESTADO
+000188 e000                      	LDI R16, 0
                                  
                                  	GUARDAR_ESTADO:
-00016a 9300 010a                 	STS estado, R16
+000189 9300 010a                 	STS estado, R16
                                  
-00016c d116                      	rcall DELAY_PEQUE
+00018b d18d                      	rcall DELAY_PEQUE
                                  
                                  	NO_MODO:
                                  
                                  //==============Enrutador de modos del reloj==============//
                                  
-00016d 9100 010a                 	LDS r16, estado
+00018c 9100 010a                 	LDS r16, estado
                                  
-00016f 3000                      	CPI r16, 0
-000170 f049                      	BREQ IR_ESTADO_0	;Mostrar la hora
+00018e 3000                      	CPI r16, 0
+00018f f049                      	BREQ IR_ESTADO_0	;Mostrar la hora
                                  
-000171 3001                      	CPI r16, 1
-000172 f041                      	BREQ IR_ESTADO_1	;Mosrar la fecha  
+000190 3001                      	CPI r16, 1
+000191 f041                      	BREQ IR_ESTADO_1	;Mosrar la fecha  
                                  
-000173 3002                      	CPI r16, 2
-000174 f039                      	BREQ IR_ESTADO_2	;Configurar la hora
+000192 3002                      	CPI r16, 2
+000193 f039                      	BREQ IR_ESTADO_2	;Configurar la hora
                                  
-000175 3003                      	CPI r16, 3
-000176 f031                      	BREQ IR_ESTADO_3	;Configurar la fecha
+000194 3003                      	CPI r16, 3
+000195 f031                      	BREQ IR_ESTADO_3	;Configurar la fecha
                                  
-000177 3004                      	CPI r16, 4
-000178 f029                      	BREQ IR_ESTADO_4	;Configurar la alarma 
+000196 3004                      	CPI r16, 4
+000197 f029                      	BREQ IR_ESTADO_4	;Configurar la alarma 
                                  
-000179 cfe2                      	RJMP MAIN_LOOP
+000198 cfe3                      	RJMP MAIN_LOOP
                                  
                                  	//Utilizo estas etiquetas ya que el codigo al ser muy largo instrucciones como BREQ no funcionan y es necesario hace un RJMP 
-00017a c004                      	IR_ESTADO_0:  RJMP ESTADO_0
-00017b c035                      	IR_ESTADO_1:  RJMP ESTADO_1
-00017c c035                      	IR_ESTADO_2:  RJMP ESTADO_2
-00017d c077                      	IR_ESTADO_3:  RJMP ESTADO_3
-00017e c077                      	IR_ESTADO_4:  RJMP ESTADO_4
+000199 c004                      	IR_ESTADO_0:  RJMP ESTADO_0
+00019a c03a                      	IR_ESTADO_1:  RJMP ESTADO_1
+00019b c03b                      	IR_ESTADO_2:  RJMP ESTADO_2
+00019c c07e                      	IR_ESTADO_3:  RJMP ESTADO_3
+00019d c0a8                      	IR_ESTADO_4:  RJMP ESTADO_4
                                  
                                  //=============Estado 0 | Mostrar Hora====================//
                                  	
                                  	//Corazon | Este lee la flag y inicia el conteo de los segundos
                                  	ESTADO_0:
                                  
-00017f e000                      	LDI R16, 0
-000180 9300 010b                     STS hh_inc_ev, R16
-000182 9300 010c                     STS hh_dec_ev, R16
-000184 9300 010d                     STS mm_inc_ev, R16
-000186 9300 010e                     STS mm_dec_ev, R16
+00019e d161                      	rcall REFRESH_HHMM	;Mostrar la hora estado 0
                                  
-000188 9100 0103                 	LDS r16, flag_1s	;Carga el valor de flag_1s a r16
-00018a 3001                      	CPI r16, 1			;Compara el valor de la flag con 1
-00018b f681                      	BRNE MAIN_LOOP		;Si no regresa a al Main
+00019f e000                      	LDI R16, 0
+0001a0 9300 010b                     STS hh_inc_ev, R16
+0001a2 9300 010c                     STS hh_dec_ev, R16
+0001a4 9300 010d                     STS mm_inc_ev, R16
+0001a6 9300 010e                     STS mm_dec_ev, R16
                                  
-00018c e000                      	LDI r16,0
-00018d 9300 0103                 	STS flag_1s, r16	;Carga 0 limpia la flag ya atendimos la ISR
+0001a8 9100 0103                 	LDS r16, flag_1s	;Carga el valor de flag_1s a r16
+0001aa 3001                      	CPI r16, 1			;Compara el valor de la flag con 1
+0001ab f681                      	BRNE MAIN_LOOP		;Si no regresa a al Main
+                                 
+0001ac e000                      	LDI r16,0
+0001ad 9300 0103                 	STS flag_1s, r16	;Carga 0 limpia la flag ya atendimos la ISR
                                  
                                  	//Segundos
-00018f 9100 0102                 	LDS  R16, secs		
-000191 9503                          INC  R16
-000192 330c                          CPI  R16, 60
-000193 f0d0                          BRLO GUARDAR_SEC
-000194 e000                          LDI  R16, 0			
-000195 9300 0102                 	STS secs, r16	
+0001af 9100 0102                 	LDS  R16, secs		
+0001b1 9503                          INC  R16
+0001b2 330c                          CPI  R16, 60
+0001b3 f0e8                          BRLO GUARDAR_SEC
+0001b4 e000                          LDI  R16, 0			
+0001b5 9300 0102                 	STS secs, r16	
                                  	
                                  	//Minutos 
-000197 9100 0101                 	LDS  R16, mins
-000199 9503                      	INC  R16
-00019a 330c                      	CPI  R16, 60
-00019b f070                      	BRLO GUARDAR_MIN
-00019c e000                      	LDI  R16, 0
-00019d 9300 0101                 	STS mins, r16
+0001b7 9100 0101                 	LDS  R16, mins
+0001b9 9503                      	INC  R16
+0001ba 330c                      	CPI  R16, 60
+0001bb f080                      	BRLO GUARDAR_MIN
+0001bc e000                      	LDI  R16, 0
+0001bd 9300 0101                 	STS mins, r16
                                  
                                  	//Hora 
-00019f 9100 0100                 	LDS  R16, hora
-0001a1 9503                          INC  R16
-0001a2 3108                          CPI  R16, 24
-0001a3 f008                          BRLO GUARDAR_HORA
-0001a4 e000                          LDI  R16, 0
+0001bf 9100 0100                 	LDS  R16, hora
+0001c1 9503                          INC  R16
+0001c2 3108                          CPI  R16, 24
+0001c3 f010                          BRLO GUARDAR_HORA
+0001c4 e000                          LDI  R16, 0
+0001c5 d1ea                      	rcall INCREMENTAR_FECHA
+                                 
                                  
                                  	GUARDAR_HORA:
-0001a5 9300 0100                 	STS  hora, R16
-0001a7 d05c                          RCALL UPDATE_HORA_DIGITS
-0001a8 d04e                          RCALL UPDATE_MIN_DIGITS
-0001a9 cfb2                          RJMP MAIN_LOOP
+0001c6 9300 0100                 	STS  hora, R16
+                                 
+0001c8 d0d1                          RCALL UPDATE_HORA_DIGITS		;Llama a la rutina para actualizar el valor de la hora en los displays
+0001c9 d0c3                          RCALL UPDATE_MIN_DIGITS			;Llama a la rutina para actualizar el valor de los minutos en los displays
+0001ca d251                      	RCALL REVISAR_ALARMA			;Llama a la rutina para comparar el valor configurado en modo_0 y modo_4
+0001cb cfb0                          RJMP MAIN_LOOP
                                  
                                  	GUARDAR_MIN:
-0001aa 9300 0101                 	STS mins, r16
+0001cc 9300 0101                 	STS mins, r16
                                  
-0001ac d04a                      	RCALL UPDATE_MIN_DIGITS   
-0001ad cfae                      	RJMP MAIN_LOOP
+0001ce d0be                      	RCALL UPDATE_MIN_DIGITS   
+0001cf d24c                      	RCALL REVISAR_ALARMA			;Llama a la rutina para comparar el valor configurado en modo_0 y modo_4
+0001d0 cfab                      	RJMP MAIN_LOOP
                                  
                                  	GUARDAR_SEC:
-0001ae 9300 0102                 	STS secs, r16
+0001d1 9300 0102                 	STS secs, r16
+                                 
+0001d3 d248                      	RCALL REVISAR_ALARMA			;Llama a la rutina para comparar el valor configurado en modo_0 y modo_4
                                  	
-0001b0 cfab                      	RJMP MAIN_LOOP
+0001d4 cfa7                      	RJMP MAIN_LOOP
                                  
                                  //=============Estado 1 | Mostrar Fecha====================//
                                  	ESTADO_1:
                                  
-0001b1 cfaa                          RJMP MAIN_LOOP
+0001d5 d161                      	rcall REFRESH_DDMM		;Llama a la rutina para mostrar la fecha
+                                 
+0001d6 cfa5                          RJMP MAIN_LOOP
                                  
                                  //=============Estado 2 | Configurar Hora====================//
                                  	ESTADO_2:
                                  
+0001d7 d128                      	rcall REFRESH_HHMM		;Mostrar la hora mientras se configura 
+                                 
                                  	//Incremento y decremento de horas 
                                  	
                                  	;Incremento 
-0001b2 9100 010b                 	LDS  r16, hh_inc_ev			;Hay flag de incremento horas?
-0001b4 3001                          CPI  r16, 1
-0001b5 f461                          BRNE REVISAR_HH_DEC			;No? okay ,revisar el siguiente
+0001d8 9100 010b                 	LDS  r16, hh_inc_ev			;Hay flag de incremento horas?
+0001da 3001                          CPI  r16, 1
+0001db f461                          BRNE REVISAR_HH_DEC			;No? okay ,revisar el siguiente
                                  
-0001b6 e000                          LDI  r16, 0
-0001b7 9300 010b                     STS  hh_inc_ev, r16          ;Si?limpiar evento
+0001dc e000                          LDI  r16, 0
+0001dd 9300 010b                     STS  hh_inc_ev, r16          ;Si?limpiar evento
                                  
-0001b9 9100 0100                 	LDS  r16, hora
-0001bb 9503                          INC  r16
-0001bc 3108                          CPI  r16, 24
-0001bd f008                          BRLO GUARDAR_HH_INC
-0001be e000                          LDI  r16, 0
+0001df 9100 0100                 	LDS  r16, hora
+0001e1 9503                          INC  r16
+0001e2 3108                          CPI  r16, 24
+0001e3 f008                          BRLO GUARDAR_HH_INC
+0001e4 e000                          LDI  r16, 0
                                  	
                                  	GUARDAR_HH_INC:
-0001bf 9300 0100                     STS  hora, r16
-0001c1 d042                          RCALL UPDATE_HORA_DIGITS
+0001e5 9300 0100                     STS  hora, r16
+0001e7 d0b2                          RCALL UPDATE_HORA_DIGITS
                                  
                                  	;Decremento 
                                  	REVISAR_HH_DEC:				
-0001c2 9100 010c                 	LDS r16, hh_dec_ev			;Hay flag de decremento de horas?
-0001c4 3001                      	CPI r16, 1
-0001c5 f469                      	BRNE REVISAR_MM_INC			; No?, OKay ,revisa el siguiente
+0001e8 9100 010c                 	LDS r16, hh_dec_ev			;Hay flag de decremento de horas?
+0001ea 3001                      	CPI r16, 1
+0001eb f469                      	BRNE REVISAR_MM_INC			; No?, OKay ,revisa el siguiente
                                  
-0001c6 e000                      	LDI r16, 0
-0001c7 9300 010c                 	STS hh_dec_ev, r16				;Si?Limpiar evento 
+0001ec e000                      	LDI r16, 0
+0001ed 9300 010c                 	STS hh_dec_ev, r16				;Si?Limpiar evento 
                                  
-0001c9 9100 0100                 	LDS  R16, hora
-0001cb 3000                          CPI  R16, 0					;La hora es cero?
-0001cc f411                          BRNE HH_DEC_NORMAL			;No es igual a 0 decremento normal
-0001cd e107                          LDI  R16, 23				;Si es 0? carga 23
-0001ce c001                          RJMP GUARDAR_HH_DEC
+0001ef 9100 0100                 	LDS  R16, hora
+0001f1 3000                          CPI  R16, 0					;La hora es cero?
+0001f2 f411                          BRNE HH_DEC_NORMAL			;No es igual a 0 decremento normal
+0001f3 e107                          LDI  R16, 23				;Si es 0? carga 23
+0001f4 c001                          RJMP GUARDAR_HH_DEC
                                  	
                                  	HH_DEC_NORMAL:				
-0001cf 950a                          DEC  R16
+0001f5 950a                          DEC  R16
                                  	
                                  	GUARDAR_HH_DEC:
-0001d0 9300 0100                     STS  hora, R16
-0001d2 d031                          RCALL UPDATE_HORA_DIGITS
+0001f6 9300 0100                     STS  hora, R16
+0001f8 d0a1                          RCALL UPDATE_HORA_DIGITS
                                  
                                  	//Incremennto y decrementos de minutos 
                                  
                                  	;Incremento 
                                  	REVISAR_MM_INC:
-0001d3 9100 010d                 	LDS r16, mm_inc_ev			;Hay flag de incremento de minutos?
-0001d5 3001                      	CPI r16, 1
-0001d6 f461                      	BRNE REVISAR_MM_DEC			;No? OKay revisa el siguiente 
+0001f9 9100 010d                 	LDS r16, mm_inc_ev			;Hay flag de incremento de minutos?
+0001fb 3001                      	CPI r16, 1
+0001fc f461                      	BRNE REVISAR_MM_DEC			;No? OKay revisa el siguiente 
                                  
-0001d7 e000                      	LDI r16, 0
-0001d8 9300 010d                 	STS mm_inc_ev, r16				;Si? Limpiar el evento 
+0001fd e000                      	LDI r16, 0
+0001fe 9300 010d                 	STS mm_inc_ev, r16				;Si? Limpiar el evento 
                                  
-0001da 9100 0101                 	LDS  R16, mins
-0001dc 9503                          INC  R16
-0001dd 330c                          CPI  R16, 60
-0001de f008                          BRLO GUARDAR_MM_INC
-0001df e000                          LDI  R16, 0
+000200 9100 0101                 	LDS  R16, mins
+000202 9503                          INC  R16
+000203 330c                          CPI  R16, 60
+000204 f008                          BRLO GUARDAR_MM_INC
+000205 e000                          LDI  R16, 0
                                  	
                                  	GUARDAR_MM_INC:
-0001e0 9300 0101                     STS  mins, R16
-0001e2 d014                          RCALL UPDATE_MIN_DIGITS
+000206 9300 0101                     STS  mins, R16
+000208 d084                          RCALL UPDATE_MIN_DIGITS
                                  
                                  	;Decremento 
                                  	REVISAR_MM_DEC:
-0001e3 9100 010e                 	LDS r16, mm_dec_ev			;Hay flag de decremento de minutos?
-0001e5 3001                      	CPI r16, 1
-0001e6 f469                      	BRNE FINAL_ESTADO_2			;No? OKay regresa a al incio de la funcion modo 2
+000209 9100 010e                 	LDS r16, mm_dec_ev			;Hay flag de decremento de minutos?
+00020b 3001                      	CPI r16, 1
+00020c f469                      	BRNE FINAL_ESTADO_2			;No? OKay regresa a al incio de la funcion modo 2
                                  
-0001e7 e000                      	LDI r16, 0
-0001e8 9300 010e                 	STS mm_dec_ev, r16				;Si? Limpiar evento 
+00020d e000                      	LDI r16, 0
+00020e 9300 010e                 	STS mm_dec_ev, r16				;Si? Limpiar evento 
                                  
-0001ea 9100 0101                 	LDS  R16, mins
-0001ec 3000                          CPI  R16, 0					;Los minutos estan en 0
-0001ed f411                          BRNE MM_DEC_NORMAL			;No es igual a 0? Okay decremento normal 
-0001ee e30b                          LDI  R16, 59				;Carga 59
-0001ef c001                          RJMP GUARDAR_MM_DEC
+000210 9100 0101                 	LDS  R16, mins
+000212 3000                          CPI  R16, 0					;Los minutos estan en 0
+000213 f411                          BRNE MM_DEC_NORMAL			;No es igual a 0? Okay decremento normal 
+000214 e30b                          LDI  R16, 59				;Carga 59
+000215 c001                          RJMP GUARDAR_MM_DEC
                                  	
                                  	MM_DEC_NORMAL:
-0001f0 950a                          DEC  R16
+000216 950a                          DEC  R16
                                  	
                                  	GUARDAR_MM_DEC:
-0001f1 9300 0101                     STS  mins, R16
-0001f3 d003                          RCALL UPDATE_MIN_DIGITS
+000217 9300 0101                     STS  mins, R16
+000219 d073                          RCALL UPDATE_MIN_DIGITS
                                  
                                  	FINAL_ESTADO_2:
                                  
-0001f4 cf67                          RJMP MAIN_LOOP
+00021a cf61                          RJMP MAIN_LOOP
                                  
                                  
                                  //=============Estado 3 | Configurar Fecha====================//
                                  	ESTADO_3:
                                  
-0001f5 cf66                          RJMP MAIN_LOOP
+00021b d11b                      	rcall REFRESH_DDMM		;Mostrar la fecha mientras se configura 
+                                 
+                                 	//Incremento y decremento de dia
+                                 
+                                 	;Incremento 
+00021c 9100 010b                 	LDS  r16, hh_inc_ev
+00021e 3001                          CPI  r16, 1
+00021f f429                          BRNE REVISAR_DIA_DEC
+                                 
+000220 e000                          LDI  r16, 0
+000221 9300 010b                     STS  hh_inc_ev, r16        ; limpiar evento
+                                 
+000223 d14d                          RCALL INC_DIA              ; Llama la rutina de incrementar dia 
+000224 d0f8                          RCALL UPDATE_DIA_DIGITS
+                                 
+                                 
+                                 	;Decremento
+                                 	REVISAR_DIA_DEC:
+                                 	
+000225 9100 010c                 	LDS  r16, hh_dec_ev
+000227 3001                          CPI  r16, 1
+000228 f429                          BRNE REVISAR_MES_INC
+                                 
+000229 e000                          LDI  r16, 0
+00022a 9300 010c                     STS  hh_dec_ev, r16        ; Limpiar evento
+                                 
+00022c d159                          RCALL DEC_DIA              ; Llama la rutina de decrementar dia 
+00022d d0ef                          RCALL UPDATE_DIA_DIGITS
+                                 
+                                 	//Incremento y decremento de meses 
+                                 
+                                 	;Incremento 
+                                 	REVISAR_MES_INC:
+00022e 9100 010d                 	LDS  r16, mm_inc_ev
+000230 3001                          CPI  r16, 1
+000231 f439                          BRNE REVISAR_MES_DEC
+                                 
+000232 e000                          LDI  r16, 0
+000233 9300 010d                     STS  mm_inc_ev, r16			; limpiar evento
+                                 
+000235 d163                          RCALL INC_MES				; Llama la rutina de incrementar mes
+000236 d12d                          RCALL AJUSTAR_DIA_POR_MES	; Llama una rutina que ajusta los dias al mes que toca 
+000237 d0f2                          RCALL UPDATE_MES_DIGITS		; Llama la rutina de actualizar el valor de el mes 
+000238 d0e4                          RCALL UPDATE_DIA_DIGITS		; LLama a la rutina de actualizar el valor de los dias
+                                 
+                                 	;Decremento 
+                                 	REVISAR_MES_DEC:
+000239 9100 010e                 	LDS  r16, mm_dec_ev
+00023b 3001                          CPI  r16, 1
+00023c f439                          BRNE FINAL_ESTADO_3
+                                 
+00023d e000                          LDI  r16, 0
+00023e 9300 010e                     STS  mm_dec_ev, r16        ; limpiar evento
+                                 
+000240 d163                          RCALL DEC_MES              ; mes--
+000241 d122                          RCALL AJUSTAR_DIA_POR_MES
+000242 d0e7                          RCALL UPDATE_MES_DIGITS
+000243 d0d9                          RCALL UPDATE_DIA_DIGITS
+                                 
+                                 	FINAL_ESTADO_3:
+000244 cf37                          RJMP MAIN_LOOP
+                                 
+                                 
+                                 
+000245 cf36                          RJMP MAIN_LOOP
                                  
                                  //=============Estado 4 | Configurar Alarma ====================//
                                  	ESTADO_4:
                                  
-0001f6 cf65                          RJMP MAIN_LOOP
+000246 d1b2                      	RCALL REFRESH_ALARMA
+000247 e001                      	LDI r16, 1
+000248 9300 011d                 	STS alarm_on, r16
+                                 	//Incremento y decremento de hora de la alarma
+                                 	
+                                 	;Incremento 
+00024a 9100 010b                     LDS  r16, hh_inc_ev
+00024c 3001                          CPI  r16, 1
+00024d f461                          BRNE REVISAR_ALARMA_HH_DEC
+                                 
+00024e e000                          LDI  r16, 0
+00024f 9300 010b                     STS  hh_inc_ev, r16
+                                 
+000251 9100 0117                     LDS  r16, alarm_hora
+000253 9503                          INC  r16
+000254 3108                          CPI  r16, 24
+000255 f008                          BRLO GUARDAR_ALARMA_HH_INC
+000256 e000                          LDI  r16, 0
+                                 
+                                 	GUARDAR_ALARMA_HH_INC:
+000257 9300 0117                     STS  alarm_hora, r16
+000259 d185                          RCALL UPDATE_ALARMA_HORA_DIGITS
+                                 
+                                 
+                                     ;Decremento 
+                                 	REVISAR_ALARMA_HH_DEC:
+00025a 9100 010c                     LDS  r16, hh_dec_ev
+00025c 3001                          CPI  r16, 1
+00025d f469                          BRNE REVISAR_ALARMA_MM_INC
+                                 
+00025e e000                          LDI  r16, 0
+00025f 9300 010c                     STS  hh_dec_ev, r16
+                                 
+000261 9100 0117                     LDS  r16, alarm_hora
+000263 3000                          CPI  r16, 0
+000264 f411                          BRNE ALARMA_HH_DEC_NORMAL
+000265 e107                          LDI  r16, 23
+000266 c001                          RJMP GUARDAR_ALARMA_HH_DEC
+                                 
+                                 	ALARMA_HH_DEC_NORMAL:
+000267 950a                          DEC  r16
+                                 
+                                 	GUARDAR_ALARMA_HH_DEC:
+000268 9300 0117                     STS  alarm_hora, r16
+00026a d174                          RCALL UPDATE_ALARMA_HORA_DIGITS
+                                 
+                                 	//Incremento y decremento de minutos de la alarma 
+                                 	
+                                 	;Incremento 
+                                 	REVISAR_ALARMA_MM_INC:
+00026b 9100 010d                     LDS  r16, mm_inc_ev
+00026d 3001                          CPI  r16, 1
+00026e f461                          BRNE REVISAR_ALARMA_MM_DEC
+                                 
+00026f e000                          LDI  r16, 0
+000270 9300 010d                     STS  mm_inc_ev, r16
+                                 
+000272 9100 0118                     LDS  r16, alarm_mins
+000274 9503                          INC  r16
+000275 330c                          CPI  r16, 60
+000276 f008                          BRLO GUARDAR_ALARMA_MM_INC
+000277 e000                          LDI  r16, 0
+                                 
+                                 	GUARDAR_ALARMA_MM_INC:
+000278 9300 0118                     STS  alarm_mins, r16
+00027a d171                          RCALL UPDATE_ALARMA_MIN_DIGITS
+                                 
+                                 
+                                     ;Decremento minutos alarma
+                                 	REVISAR_ALARMA_MM_DEC:
+00027b 9100 010e                     LDS  r16, mm_dec_ev
+00027d 3001                          CPI  r16, 1
+00027e f469                          BRNE FINAL_ESTADO_4
+                                 
+00027f e000                          LDI  r16, 0
+000280 9300 010e                     STS  mm_dec_ev, r16
+                                 
+000282 9100 0118                     LDS  r16, alarm_mins
+000284 3000                          CPI  r16, 0
+000285 f411                          BRNE ALARMA_MM_DEC_NORMAL
+000286 e30b                          LDI  r16, 59
+000287 c001                          RJMP GUARDAR_ALARMA_MM_DEC
+                                 
+                                 	ALARMA_MM_DEC_NORMAL:
+000288 950a                          DEC  r16
+                                 
+                                 	GUARDAR_ALARMA_MM_DEC:
+000289 9300 0118                     STS  alarm_mins, r16
+00028b d160                          RCALL UPDATE_ALARMA_MIN_DIGITS
+                                 
+                                 	FINAL_ESTADO_4:
+00028c ceef                          RJMP MAIN_LOOP
                                  
                                  /****************************************/
                                  // NON-Interrupt subroutines
@@ -1442,262 +1663,656 @@ C:\Users\Dylan Mazariegos M\Desktop\Github - copia\Programacion_Microcontrolador
                                  
                                  	//Convertir min----> Decenas/Unidades 
                                  
-                                 	UPDATE_MIN_DIGITS:	;Sb1
+                                 	UPDATE_MIN_DIGITS:	
                                  
-0001f7 9100 0101                     LDS R16, mins     
-0001f9 2711                          CLR R17           
+00028d 9100 0101                     LDS R16, mins     
+00028f 2711                          CLR R17           
                                  
                                  	 MIN_LOOP:
-0001fa 300a                      		CPI R16, 10
-0001fb f018                      		BRLO MIN_DONE
-0001fc 500a                      		SUBI R16, 10
-0001fd 9513                      		INC R17
-0001fe cffb                      		RJMP MIN_LOOP
+000290 300a                      		CPI R16, 10
+000291 f018                      		BRLO MIN_DONE
+000292 500a                      		SUBI R16, 10
+000293 9513                      		INC R17
+000294 cffb                      		RJMP MIN_LOOP
                                  
                                  	 MIN_DONE:
-0001ff 9310 0106                 		STS min_dec, R17
-000201 9300 0107                 		STS min_unid, R16
-000203 9508                      		RET
+000295 9310 0106                 		STS min_dec, R17
+000297 9300 0107                 		STS min_unid, R16
+000299 9508                      		RET
                                  
                                  	//Convertir hora----->> Decenas/Unidades
                                  
                                  	UPDATE_HORA_DIGITS:
-000204 9100 0100                     LDS R16, hora      
-000206 2711                          CLR R17            
+00029a 9100 0100                     LDS R16, hora      
+00029c 2711                          CLR R17            
                                  
                                  	 H_LOOP:
-000207 300a                      		CPI R16, 10
-000208 f018                      		BRLO H_DONE
-000209 500a                      		SUBI R16, 10
-00020a 9513                      		INC R17
-00020b cffb                      		RJMP H_LOOP
+00029d 300a                      		CPI R16, 10
+00029e f018                      		BRLO H_DONE
+00029f 500a                      		SUBI R16, 10
+0002a0 9513                      		INC R17
+0002a1 cffb                      		RJMP H_LOOP
                                  
                                  	H_DONE:
-00020c 9310 0108                 		STS hora_dec, R17
-00020e 9300 0109                 		STS hora_unid, R16
-000210 9508                      		RET
+0002a2 9310 0108                 		STS hora_dec, R17
+0002a4 9300 0109                 		STS hora_unid, R16
+0002a6 9508                      		RET
                                  
                                  	//Rutina para dibujar un digito 0 a 9 
                                  
-                                 	LIMPIAR_SEG:		;Sb3
+                                 	LIMPIAR_SEG:		
                                  
-000211 982c                      	CBI PORTB, PORTB4     ; A
-000212 985a                          CBI PORTD, PORTD2     ; B
-000213 985b                          CBI PORTD, PORTD3     ; C
-000214 985c                          CBI PORTD, PORTD4     ; D
-000215 985d                          CBI PORTD, PORTD5     ; E
-000216 985e                          CBI PORTD, PORTD6     ; F
-000217 985f                          CBI PORTD, PORTD7     ; G
-000218 9508                          RET
+0002a7 982c                      	CBI PORTB, PORTB4     ; A
+0002a8 985a                          CBI PORTD, PORTD2     ; B
+0002a9 985b                          CBI PORTD, PORTD3     ; C
+0002aa 985c                          CBI PORTD, PORTD4     ; D
+0002ab 985d                          CBI PORTD, PORTD5     ; E
+0002ac 985e                          CBI PORTD, PORTD6     ; F
+0002ad 985f                          CBI PORTD, PORTD7     ; G
+0002ae 9508                          RET
                                  
-                                 	MOSTRAR_DIGITO:		;SB4
-000219 dff7                      	rcall LIMPIAR_SEG
+                                 	MOSTRAR_DIGITO:		
+0002af dff7                      	rcall LIMPIAR_SEG
                                  
-00021a 3000                      	CPI R16, 0
-00021b f099                          BREQ D0
-00021c 3001                          CPI R16, 1
-00021d f0c1                          BREQ D1
-00021e 3002                          CPI R16, 2
-00021f f0c9                          BREQ D2
-000220 3003                          CPI R16, 3
-000221 f0e9                          BREQ D3
-000222 3004                          CPI R16, 4
-000223 f109                          BREQ D4
-000224 3005                          CPI R16, 5
-000225 f121                          BREQ D5
-000226 3006                          CPI R16, 6
-000227 f141                          BREQ D6
-000228 3007                          CPI R16, 7
-000229 f169                          BREQ D7
-00022a 3008                          CPI R16, 8
-00022b f179                          BREQ D8
-00022c 3009                          CPI R16, 9
-00022d f1a9                          BREQ D9
-00022e 9508                          RET
+0002b0 3000                      	CPI R16, 0
+0002b1 f099                          BREQ D0
+0002b2 3001                          CPI R16, 1
+0002b3 f0c1                          BREQ D1
+0002b4 3002                          CPI R16, 2
+0002b5 f0c9                          BREQ D2
+0002b6 3003                          CPI R16, 3
+0002b7 f0e9                          BREQ D3
+0002b8 3004                          CPI R16, 4
+0002b9 f109                          BREQ D4
+0002ba 3005                          CPI R16, 5
+0002bb f121                          BREQ D5
+0002bc 3006                          CPI R16, 6
+0002bd f141                          BREQ D6
+0002be 3007                          CPI R16, 7
+0002bf f169                          BREQ D7
+0002c0 3008                          CPI R16, 8
+0002c1 f179                          BREQ D8
+0002c2 3009                          CPI R16, 9
+0002c3 f1a9                          BREQ D9
+0002c4 9508                          RET
                                  
                                  	D0: ; A B C D E F
-00022f 9a2c                          SBI PORTB, PORTB4
-000230 9a5a                          SBI PORTD, PORTD2
-000231 9a5b                          SBI PORTD, PORTD3
-000232 9a5c                          SBI PORTD, PORTD4
-000233 9a5d                          SBI PORTD, PORTD5
-000234 9a5e                          SBI PORTD, PORTD6
-000235 9508                          RET
+0002c5 9a2c                          SBI PORTB, PORTB4
+0002c6 9a5a                          SBI PORTD, PORTD2
+0002c7 9a5b                          SBI PORTD, PORTD3
+0002c8 9a5c                          SBI PORTD, PORTD4
+0002c9 9a5d                          SBI PORTD, PORTD5
+0002ca 9a5e                          SBI PORTD, PORTD6
+0002cb 9508                          RET
                                  
                                  	D1: ; B C
-000236 9a5a                          SBI PORTD, PORTD2
-000237 9a5b                          SBI PORTD, PORTD3
-000238 9508                          RET
+0002cc 9a5a                          SBI PORTD, PORTD2
+0002cd 9a5b                          SBI PORTD, PORTD3
+0002ce 9508                          RET
                                  
                                  	D2: ; A B D E G
-000239 9a2c                          SBI PORTB, PORTB4
-00023a 9a5a                          SBI PORTD, PORTD2
-00023b 9a5c                          SBI PORTD, PORTD4
-00023c 9a5d                          SBI PORTD, PORTD5
-00023d 9a5f                          SBI PORTD, PORTD7
-00023e 9508                          RET
+0002cf 9a2c                          SBI PORTB, PORTB4
+0002d0 9a5a                          SBI PORTD, PORTD2
+0002d1 9a5c                          SBI PORTD, PORTD4
+0002d2 9a5d                          SBI PORTD, PORTD5
+0002d3 9a5f                          SBI PORTD, PORTD7
+0002d4 9508                          RET
                                  
                                  	D3: ; A B C D G
-00023f 9a2c                          SBI PORTB, PORTB4
-000240 9a5a                          SBI PORTD, PORTD2
-000241 9a5b                          SBI PORTD, PORTD3
-000242 9a5c                          SBI PORTD, PORTD4
-000243 9a5f                          SBI PORTD, PORTD7
-000244 9508                          RET
+0002d5 9a2c                          SBI PORTB, PORTB4
+0002d6 9a5a                          SBI PORTD, PORTD2
+0002d7 9a5b                          SBI PORTD, PORTD3
+0002d8 9a5c                          SBI PORTD, PORTD4
+0002d9 9a5f                          SBI PORTD, PORTD7
+0002da 9508                          RET
                                  
                                  	D4: ; B C F G
-000245 9a5a                          SBI PORTD, PORTD2
-000246 9a5b                          SBI PORTD, PORTD3
-000247 9a5e                          SBI PORTD, PORTD6
-000248 9a5f                          SBI PORTD, PORTD7
-000249 9508                          RET
+0002db 9a5a                          SBI PORTD, PORTD2
+0002dc 9a5b                          SBI PORTD, PORTD3
+0002dd 9a5e                          SBI PORTD, PORTD6
+0002de 9a5f                          SBI PORTD, PORTD7
+0002df 9508                          RET
                                  
                                  	D5: ; A C D F G
-00024a 9a2c                          SBI PORTB, PORTB4
-00024b 9a5b                          SBI PORTD, PORTD3
-00024c 9a5c                          SBI PORTD, PORTD4
-00024d 9a5e                          SBI PORTD, PORTD6
-00024e 9a5f                          SBI PORTD, PORTD7
-00024f 9508                          RET
+0002e0 9a2c                          SBI PORTB, PORTB4
+0002e1 9a5b                          SBI PORTD, PORTD3
+0002e2 9a5c                          SBI PORTD, PORTD4
+0002e3 9a5e                          SBI PORTD, PORTD6
+0002e4 9a5f                          SBI PORTD, PORTD7
+0002e5 9508                          RET
                                  
                                  	D6: ; A C D E F G
-000250 9a2c                          SBI PORTB, PORTB4
-000251 9a5b                          SBI PORTD, PORTD3
-000252 9a5c                          SBI PORTD, PORTD4
-000253 9a5d                          SBI PORTD, PORTD5
-000254 9a5e                          SBI PORTD, PORTD6
-000255 9a5f                          SBI PORTD, PORTD7
-000256 9508                          RET
+0002e6 9a2c                          SBI PORTB, PORTB4
+0002e7 9a5b                          SBI PORTD, PORTD3
+0002e8 9a5c                          SBI PORTD, PORTD4
+0002e9 9a5d                          SBI PORTD, PORTD5
+0002ea 9a5e                          SBI PORTD, PORTD6
+0002eb 9a5f                          SBI PORTD, PORTD7
+0002ec 9508                          RET
                                  
                                  	D7: ; A B C
-000257 9a2c                          SBI PORTB, PORTB4
-000258 9a5a                          SBI PORTD, PORTD2
-000259 9a5b                          SBI PORTD, PORTD3
-00025a 9508                          RET
+0002ed 9a2c                          SBI PORTB, PORTB4
+0002ee 9a5a                          SBI PORTD, PORTD2
+0002ef 9a5b                          SBI PORTD, PORTD3
+0002f0 9508                          RET
                                  
                                  	D8: ; A B C D E F G
-00025b 9a2c                          SBI PORTB, PORTB4
-00025c 9a5a                          SBI PORTD, PORTD2
-00025d 9a5b                          SBI PORTD, PORTD3
-00025e 9a5c                          SBI PORTD, PORTD4
-00025f 9a5d                          SBI PORTD, PORTD5
-000260 9a5e                          SBI PORTD, PORTD6
-000261 9a5f                          SBI PORTD, PORTD7
-000262 9508                          RET
+0002f1 9a2c                          SBI PORTB, PORTB4
+0002f2 9a5a                          SBI PORTD, PORTD2
+0002f3 9a5b                          SBI PORTD, PORTD3
+0002f4 9a5c                          SBI PORTD, PORTD4
+0002f5 9a5d                          SBI PORTD, PORTD5
+0002f6 9a5e                          SBI PORTD, PORTD6
+0002f7 9a5f                          SBI PORTD, PORTD7
+0002f8 9508                          RET
                                  
                                  	D9: ; A B C D F G
-000263 9a2c                          SBI PORTB, PORTB4
-000264 9a5a                          SBI PORTD, PORTD2
-000265 9a5b                          SBI PORTD, PORTD3
-000266 9a5c                          SBI PORTD, PORTD4
-000267 9a5e                          SBI PORTD, PORTD6
-000268 9a5f                          SBI PORTD, PORTD7
-000269 9508                          RET
+0002f9 9a2c                          SBI PORTB, PORTB4
+0002fa 9a5a                          SBI PORTD, PORTD2
+0002fb 9a5b                          SBI PORTD, PORTD3
+0002fc 9a5c                          SBI PORTD, PORTD4
+0002fd 9a5e                          SBI PORTD, PORTD6
+0002fe 9a5f                          SBI PORTD, PORTD7
+0002ff 9508                          RET
                                  
                                  	REFRESH_HHMM:	;Sb5
                                  
-00026a 9100 0108                 	LDS R16, hora_dec
-00026c dfac                          RCALL MOSTRAR_DIGITO
-00026d 9a28                          SBI PORTB, PORTB0
-00026e d014                          RCALL DELAY_PEQUE
-00026f 9828                          CBI PORTB, PORTB0	;PB0 a las decenas de Horas 
+000300 9100 0108                 	LDS R16, hora_dec
+000302 dfac                          RCALL MOSTRAR_DIGITO
+000303 9a28                          SBI PORTB, PORTB0
+000304 d014                          RCALL DELAY_PEQUE
+000305 9828                          CBI PORTB, PORTB0	;PB0 a las decenas de Horas 
                                  
-000270 9100 0109                 	LDS R16, hora_unid
-000272 dfa6                          RCALL MOSTRAR_DIGITO
-000273 9a29                          SBI PORTB, PORTB1
-000274 d00e                          RCALL DELAY_PEQUE
-000275 9829                          CBI PORTB, PORTB1	;PB1 a las unidades de horas 
+000306 9100 0109                 	LDS R16, hora_unid
+000308 dfa6                          RCALL MOSTRAR_DIGITO
+000309 9a29                          SBI PORTB, PORTB1
+00030a d00e                          RCALL DELAY_PEQUE
+00030b 9829                          CBI PORTB, PORTB1	;PB1 a las unidades de horas 
                                  
-000276 9100 0106                 	LDS r16, min_dec
-000278 dfa0                      	rcall MOSTRAR_DIGITO 
-000279 9a2a                      	SBI PORTB, PORTB2
-00027a d008                      	rcall DELAY_PEQUE
-00027b 982a                      	CBI PORTB, PORTB2	;PB2 a las decenas de Minutos 
+00030c 9100 0106                 	LDS r16, min_dec
+00030e dfa0                      	rcall MOSTRAR_DIGITO 
+00030f 9a2a                      	SBI PORTB, PORTB2
+000310 d008                      	rcall DELAY_PEQUE
+000311 982a                      	CBI PORTB, PORTB2	;PB2 a las decenas de Minutos 
                                  
-00027c 9100 0107                 	LDS r16, min_unid
-00027e df9a                      	rcall MOSTRAR_DIGITO
-00027f 9a2b                      	SBI PORTB, PORTB3
-000280 d002                      	rcall DELAY_PEQUE
-000281 982b                      	CBI PORTB, PORTB3	;PB3 a las unidades de Minutos
-000282 9508                      	RET
+000312 9100 0107                 	LDS r16, min_unid
+000314 df9a                      	rcall MOSTRAR_DIGITO
+000315 9a2b                      	SBI PORTB, PORTB3
+000316 d002                      	rcall DELAY_PEQUE
+000317 982b                      	CBI PORTB, PORTB3	;PB3 a las unidades de Minutos
+000318 9508                      	RET
                                  
                                  	DELAY_PEQUE:	;SB6
                                  
-000283 ec48                      	LDI R20, 200
+000319 ec48                      	LDI R20, 200
                                  SD1:
-000284 954a                          DEC R20
-000285 f7f1                          BRNE SD1
-000286 9508                          RET
+00031a 954a                          DEC R20
+00031b f7f1                          BRNE SD1
+00031c 9508                          RET
                                  
+                                 	//=============Estado 1 | Mostrar Fecha ====================//
+                                 
+                                 	//Convertir dia----> Decenas/Unidades 
+                                 	UPDATE_DIA_DIGITS:
+00031d 9100 0111                 	LDS R16, dia
+00031f 2711                          CLR R17
+                                 
+                                 	DIA_LOOP:
+000320 300a                          CPI R16, 10
+000321 f018                          BRLO DIA_YA
+000322 500a                          SUBI R16, 10
+000323 9513                          INC R17
+000324 cffb                          RJMP DIA_LOOP
+                                 
+                                 	DIA_YA:
+000325 9310 0113                     STS dia_dec, R17
+000327 9300 0114                     STS dia_unid, R16
+000329 9508                          RET
+                                 
+                                 	//Convertir mes----> Decenas/Unidades 
+                                 	
+                                 	UPDATE_MES_DIGITS:
+00032a 9100 0112                     LDS R16, mes
+00032c 2711                          CLR R17
+                                 
+                                 	MES_LOOP:
+00032d 300a                          CPI R16, 10
+00032e f018                          BRLO MES_YA
+00032f 500a                          SUBI R16, 10
+000330 9513                          INC R17
+000331 cffb                          RJMP MES_LOOP
+                                 
+                                 	MES_YA:
+000332 9310 0115                     STS mes_dec, R17
+000334 9300 0116                     STS mes_unid, R16
+000336 9508                          RET
+                                 
+                                 	//Rutina para mostrar el valor de la fecha en los displays 
+                                 	REFRESH_DDMM:
+                                 
+000337 9100 0113                     LDS R16, dia_dec
+000339 df75                          RCALL MOSTRAR_DIGITO
+00033a 9a28                          SBI  PORTB, PORTB0
+00033b dfdd                          RCALL DELAY_PEQUE
+00033c 9828                          CBI  PORTB, PORTB0		;PB0 a las decenas de dia 
+                                 
+00033d 9100 0114                     LDS R16, dia_unid
+00033f df6f                          RCALL MOSTRAR_DIGITO
+000340 9a29                          SBI  PORTB, PORTB1
+000341 dfd7                          RCALL DELAY_PEQUE
+000342 9829                          CBI  PORTB, PORTB1		;PB1 a las unidades de dia
+                                 
+000343 9100 0115                     LDS R16, mes_dec
+000345 df69                          RCALL MOSTRAR_DIGITO
+000346 9a2a                          SBI  PORTB, PORTB2
+000347 dfd1                          RCALL DELAY_PEQUE
+000348 982a                          CBI  PORTB, PORTB2		;PB2 a las decenas de mes
+                                 
+000349 9100 0116                     LDS R16, mes_unid
+00034b df63                          RCALL MOSTRAR_DIGITO
+00034c 9a2b                          SBI  PORTB, PORTB3
+00034d dfcb                          RCALL DELAY_PEQUE
+00034e 982b                          CBI  PORTB, PORTB3		;PB3 a las unidades de mes 
+                                 
+00034f 9508                          RET
+                                 
+                                 //-----------------------Rutina numeros de meses------------------//
+                                 ;==================== Configuracion de la fecha dependiendo el mes ====================
+                                 ; Vuelve en r18 el máximo de días del mes actual basicmaente clasifica en que mes esta para que cuente bien los dias del mes
+                                 
+                                 GET_MAX_DIAS_DEL_MES:
+                                 
+000350 930f                      	PUSH r16
+000351 9100 0112                 	LDS r16, mes
+000353 e12f                      	LDI r18, 31
+                                 
+000354 3002                      	CPI r16, 2 ;Si es febrero ve a la cuenta de el mes de febrero
+000355 f049                      	BREQ _MAX28
+000356 3004                      	CPI r16, 4 ;Si es abril ve a la cuenta de el mes de abril
+000357 f049                      	BREQ _MAX30
+000358 3006                      	CPI r16, 6 ;Si es junio ve a la cuenta de el mes de junio
+000359 f039                      	BREQ _MAX30
+00035a 3009                      	CPI r16, 9 ;Si es septiembre ve a la cuenta del mes de septiembre
+00035b f029                      	BREQ _MAX30
+00035c 300b                      	CPI r16, 11 ;Si es noviembre ve a la cuenta del mes de noviembre
+00035d f019                      	BREQ _MAX30
+00035e c003                      	RJMP _MAX_FIN
+                                 	
+                                 	_MAX28:
+00035f e12c                      	LDI r18, 28
+000360 c001                      	RJMP _MAX_FIN
+                                 	_MAX30:
+000361 e12e                      	LDI r18, 30
+                                 	_MAX_FIN:
+000362 910f                      	POP r16
+000363 9508                      	RET
+                                 	
+                                 	; Si dia > maxDia(mes) entonces dia = maxDia
+                                 	AJUSTAR_DIA_POR_MES:
+000364 930f                      	PUSH r16
+000365 932f                      	PUSH r18
+000366 dfe9                      	RCALL GET_MAX_DIAS_DEL_MES ; deja max en r18
+000367 9100 0111                 	LDS r16, dia
+000369 1702                      	CP r16, r18
+00036a f018                      	BRLO _AJ_OK
+00036b f011                      	BREQ _AJ_OK
+                                 	
+                                 	; dia era mayor => recortar a max	
+00036c 9320 0111                 	STS dia, r18
+                                 	_AJ_OK:
+00036e 912f                      	POP r18
+00036f 910f                      	POP r16
+000370 9508                      	RET
+                                 	
+                                 	; Incremento de dia (si pasa max => dia=1 y mes++)
+                                 	INC_DIA:
+000371 930f                      	PUSH r16
+000372 932f                      	PUSH r18
+000373 dfdc                      	RCALL GET_MAX_DIAS_DEL_MES
+000374 9100 0111                 	LDS r16, dia
+000376 9503                      	INC r16
+000377 1702                      	CP r16, r18
+000378 f040                      	BRLO _ID_GUARDAR
+000379 f039                      	BREQ _ID_GUARDAR
+                                 	
+                                 	; rollover
+00037a e001                      	LDI r16, 1
+00037b 9300 0111                 	STS dia, r16
+00037d d01b                      	RCALL INC_MES
+00037e 912f                      	POP r18
+00037f 910f                      	POP r16
+000380 9508                      	RET
+                                 
+                                 	_ID_GUARDAR:
+000381 9300 0111                 	STS dia, r16
+000383 912f                      	POP r18
+000384 910f                      	POP r16
+000385 9508                      	RET
+                                 	
+                                 	; Decremento de dia (si dia=1 => dia=max y mes--)
+                                 	DEC_DIA:
+000386 930f                      	PUSH r16
+000387 932f                      	PUSH r18
+000388 9100 0111                 	LDS r16, dia
+00038a 3001                      	CPI r16, 1
+00038b f439                      	BRNE _DD_NORMAL
+                                 	
+                                 	; rollover hacia atrás
+00038c d017                      	RCALL DEC_MES
+00038d dfc2                      	RCALL GET_MAX_DIAS_DEL_MES
+00038e 9320 0111                 	STS dia, r18
+000390 912f                      	POP r18
+000391 910f                      	POP r16
+000392 9508                      	RET
+                                 	
+                                 	_DD_NORMAL:
+000393 950a                      	DEC r16
+000394 9300 0111                 	STS dia, r16
+000396 912f                      	POP r18
+000397 910f                      	POP r16
+000398 9508                      	RET
+                                 
+                                 	; Incremento de mes con rollover 12->1
+                                 	INC_MES:
+000399 930f                      	PUSH r16
+00039a 9100 0112                 	LDS r16, mes
+00039c 9503                      	INC r16
+00039d 300d                      	CPI r16, 13
+00039e f008                      	BRLO _IM_GUARDAR
+00039f e001                      	LDI r16, 1
+                                 	_IM_GUARDAR:
+0003a0 9300 0112                 	STS mes, r16
+0003a2 910f                      	POP r16
+0003a3 9508                      	RET
+                                 	
+                                 	; Decremento de mes con rollover 1->12
+                                 	DEC_MES:
+0003a4 930f                      	PUSH r16
+0003a5 9100 0112                 	LDS r16, mes
+0003a7 3001                      	CPI r16, 1
+0003a8 f411                      	BRNE _DM_NORMAL
+0003a9 e00c                      	LDI r16, 12
+0003aa c001                      	RJMP _DM_GUARDAR
+                                 	_DM_NORMAL:
+0003ab 950a                      	DEC r16
+                                 	_DM_GUARDAR:
+0003ac 9300 0112                 	STS mes, r16
+0003ae 910f                      	POP r16
+0003af 9508                      	RET
+                                 
+                                 	//Rutina que incrementa la fecha cuando 23:59----->00:00 | Segun el mes//
+                                 	INCREMENTAR_FECHA:
+                                 	
+0003b0 930f                      	PUSH r16
+0003b1 931f                      	PUSH r17
+0003b2 932f                      	PUSH r18
+                                 
+0003b3 9100 0111                 	LDS  r16, dia
+0003b5 9503                          INC  r16
+0003b6 9300 0111                     STS  dia, r16
+                                 
+0003b8 9110 0112                 	LDS r17, mes 
+0003ba e12f                      	LDI r18, 31		;Resto de meses con 31 dias 
+                                 
+0003bb 3012                      	CPI r17, 2
+0003bc f049                      	BREQ MAX_28		;Febrero 28 dias
+                                 
+0003bd 3014                      	CPI r17, 4		
+0003be f049                      	BREQ MAX_30		;Abril 30 dias 
+                                 
+0003bf 3016                      	CPI r17, 6		
+0003c0 f039                      	BREQ MAX_30		;Junio con 30 dias 
+                                 
+0003c1 3019                      	CPI r17, 9		
+0003c2 f029                      	BREQ MAX_30		;Septiembre con 30 dias 
+                                 
+0003c3 301b                      	CPI r17, 11
+0003c4 f019                      	BREQ MAX_30		;Noviembre con 30 dias 
+                                 
+0003c5 c003                      	RJMP REVISAR_DIA 
+                                 
+                                 
+                                 	MAX_28:
+0003c6 e12c                      		LDI r18, 28
+0003c7 c001                      	RJMP REVISAR_DIA
+                                 	
+                                 	MAX_30:
+0003c8 e12e                      		LDI r18, 30
+                                 
+                                 	REVISAR_DIA:
+                                 	
+0003c9 9100 0111                 	LDS  r16, dia
+0003cb 1720                          CP   r18, r16       
+0003cc f008                          BRLO ROLLOVER
+0003cd c00b                          RJMP FECHA_DIGITS
+                                 
+                                 	ROLLOVER:
+0003ce e001                          LDI  r16, 1
+0003cf 9300 0111                     STS  dia, r16
+                                 
+0003d1 9100 0112                     LDS  r16, mes
+0003d3 9503                          INC  r16
+0003d4 300d                          CPI  r16, 13
+0003d5 f008                          BRLO SAVE_M
+0003d6 e001                          LDI  r16, 1
+                                 	SAVE_M:
+0003d7 9300 0112                     STS  mes, r16
+                                 
+                                 	FECHA_DIGITS:
+0003d9 df43                          RCALL UPDATE_DIA_DIGITS
+0003da df4f                          RCALL UPDATE_MES_DIGITS
+                                 
+0003db 912f                          POP  r18
+0003dc 911f                          POP  r17
+0003dd 910f                          POP  r16
+                                 
+0003de 9508                      	RET	
+                                 
+                                 	//Rutina para la hora de la alarma 
+                                 	UPDATE_ALARMA_HORA_DIGITS:
+0003df 9100 0117                     LDS R16, alarm_hora
+0003e1 2711                          CLR R17
+                                 
+                                 	ALARMA_H_LOOP:
+0003e2 300a                          CPI R16, 10
+0003e3 f018                          BRLO ALARMA_H_YA
+0003e4 500a                          SUBI R16, 10
+0003e5 9513                          INC R17
+0003e6 cffb                          RJMP ALARMA_H_LOOP
+                                 
+                                 	ALARMA_H_YA:
+0003e7 9310 0119                     STS alarm_hora_dec, R17
+0003e9 9300 011a                     STS alarm_hora_unid, R16
+0003eb 9508                          RET
+                                 
+                                 	//Rutina para los minutos de la alarma 
+                                 	UPDATE_ALARMA_MIN_DIGITS:
+0003ec 9100 0118                     LDS R16, alarm_mins
+0003ee 2711                          CLR R17
+                                 
+                                 	ALARMA_M_LOOP:
+0003ef 300a                          CPI R16, 10
+0003f0 f018                          BRLO ALARMA_M_YA
+0003f1 500a                          SUBI R16, 10
+0003f2 9513                          INC R17
+0003f3 cffb                          RJMP ALARMA_M_LOOP
+                                 
+                                 	ALARMA_M_YA:
+0003f4 9310 011b                     STS alarm_min_dec, R17
+0003f6 9300 011c                     STS alarm_min_unid, R16
+0003f8 9508                          RET
+                                 
+                                 	//Rutina para mostrar el valor de la alarma, basicamente es la misma que REFRESH_HHMM pero con las variables para la alarma 
+                                 	REFRESH_ALARMA:
+                                 	
+                                 	//Parpadeo de displays en modo alarma 
+0003f9 9100 011e                 	LDS r16, parpadeo_led
+0003fb 3109                      	CPI r16, 25				
+0003fc f030                      	BRLO MOSTRAR_ALARMA
+                                 
+                                 	; si es mayor ? NO mostrar (apagado)
+0003fd dea9                      	RCALL LIMPIAR_SEG
+0003fe 9828                      	CBI PORTB, PORTB0
+0003ff 9829                      	CBI PORTB, PORTB1
+000400 982a                      	CBI PORTB, PORTB2
+000401 982b                      	CBI PORTB, PORTB3
+000402 9508                      	RET
+                                 
+                                 	MOSTRAR_ALARMA:
+                                 
+000403 9100 0119                     LDS R16, alarm_hora_dec
+000405 dea9                          RCALL MOSTRAR_DIGITO
+000406 9a28                          SBI PORTB, PORTB0
+000407 df11                          RCALL DELAY_PEQUE
+000408 9828                          CBI PORTB, PORTB0			; PB0 decenas hora alarma
+                                 
+000409 9100 011a                     LDS R16, alarm_hora_unid
+00040b dea3                          RCALL MOSTRAR_DIGITO
+00040c 9a29                          SBI PORTB, PORTB1
+00040d df0b                          RCALL DELAY_PEQUE
+00040e 9829                          CBI PORTB, PORTB1			; PB1 unidades hora alarma
+                                 
+00040f 9100 011b                     LDS R16, alarm_min_dec
+000411 de9d                          RCALL MOSTRAR_DIGITO
+000412 9a2a                          SBI PORTB, PORTB2
+000413 df05                          RCALL DELAY_PEQUE
+000414 982a                          CBI PORTB, PORTB2			 ; PB2 decenas min alarma
+                                 
+000415 9100 011c                     LDS R16, alarm_min_unid
+000417 de97                          RCALL MOSTRAR_DIGITO
+000418 9a2b                          SBI PORTB, PORTB3
+000419 deff                          RCALL DELAY_PEQUE
+00041a 982b                          CBI PORTB, PORTB3			; PB3 unidades min alarma
+                                 
+00041b 9508                          RET
+                                 
+                                 	REVISAR_ALARMA:
+                                     ; primero revisar si la alarma está activada
+00041c 9100 011d                     LDS r16, alarm_on
+00041e 3001                          CPI r16, 1
+00041f f471                          BRNE NO_ALARMA
+                                 
+                                     ; comparar hora actual con hora de alarma
+000420 9100 0100                     LDS r16, hora
+000422 9110 0117                     LDS r17, alarm_hora
+000424 1701                          CP  r16, r17
+000425 f441                          BRNE NO_ALARMA
+                                 
+                                     ; comparar minutos actuales con minutos de alarma
+000426 9100 0101                     LDS r16, mins
+000428 9110 0118                     LDS r17, alarm_mins
+00042a 1701                          CP  r16, r17
+00042b f411                          BRNE NO_ALARMA
+                                 
+00042c 9a2d                          SBI PORTB, PORTB5
+00042d 9508                          RET
+                                 
+                                 NO_ALARMA:
+00042e 982d                          CBI PORTB, PORTB5
+00042f 9508                          RET
                                  /****************************************/
                                  // Interrupt routines//
                                  
                                  ;Interrupcion del timer 1 cada para indicar que ya paso 1 segundo.
                                  ISR_TM1_COMPA:
                                  	
-000287 930f                      	PUSH r16			;Guarda el valor de r16
-000288 e001                      	LDI r16, 1
-000289 9300 0103                 	STS flag_1s, r16	; Pone en 1 la flag de 1 segundo, avisa que paso 1 segundo
-00028b 910f                      	POP r16			
+000430 930f                      	PUSH r16			;Guarda el valor de r16
+000431 e001                      	LDI r16, 1
+000432 9300 0103                 	STS flag_1s, r16	; Pone en 1 la flag de 1 segundo, avisa que paso 1 segundo
+000434 910f                      	POP r16			
                                  
-00028c 9518                      RETI
+000435 9518                      RETI
                                  
                                  ; Interrupcion de pinchange para el puerto C y clasificacion del boton de que interrumpe
                                  ISR_PCINT1:
-00028d 930f                      	PUSH R16
-00028e 931f                          PUSH R17
-00028f 932f                          PUSH R18
-000290 933f                          PUSH R19
+000436 930f                      	PUSH R16
+000437 931f                          PUSH R17
+000438 932f                          PUSH R18
+000439 933f                          PUSH R19
                                  	
-000291 b106                      	IN r16, PINC
-000292 9110 0110                 	LDS r17,ultimo_pinc
+00043a b106                      	IN r16, PINC
+00043b 9110 0110                 	LDS r17,ultimo_pinc
                                  
-000294 2f20                      	MOV r18,r16
-000295 2721                      	EOR r18, r17
-000296 9300 0110                 	STS ultimo_pinc,r16
+00043d 2f20                      	MOV r18,r16
+00043e 2721                      	EOR r18, r17
+00043f 9300 0110                 	STS ultimo_pinc,r16
                                  
-000298 e031                      	LDI r19, 1
+000441 e031                      	LDI r19, 1
                                  	
-000299 ff24                      	SBRS r18, 4
-00029a c003                      	RJMP REVISAR_PC0
-00029b ff04                      	SBRS R16, 4            
-00029c 9330 010f                     STS  cambio_modo_ev, R19
+000442 ff24                      	SBRS r18, 4
+000443 c003                      	RJMP REVISAR_PC0
+000444 ff04                      	SBRS R16, 4            
+000445 9330 010f                     STS  cambio_modo_ev, R19
                                  
                                  
                                  	REVISAR_PC0:				; Evento de incremento para el display la izquierda 
                                  	
-00029e ff20                      	SBRS r18, 0					;PC0 correspondiente a incremento de horas	
-00029f c003                          RJMP REVISAR_PC1
-0002a0 ff00                          SBRS r16, 0
-0002a1 9330 010b                     STS  hh_inc_ev, r19		
+000447 ff20                      	SBRS r18, 0					;PC0 correspondiente a incremento de horas	
+000448 c003                          RJMP REVISAR_PC1
+000449 ff00                          SBRS r16, 0
+00044a 9330 010b                     STS  hh_inc_ev, r19		
                                  
                                  	REVISAR_PC1:
                                  
-0002a3 ff21                      	SBRS r18, 1					;PC1 correspondiente al decremento de horas 
-0002a4 c003                      	RJMP REVISAR_PC2
-0002a5 ff01                      	SBRS r16, 1
-0002a6 9330 010c                 	STS hh_dec_ev, r19
+00044c ff21                      	SBRS r18, 1					;PC1 correspondiente al decremento de horas 
+00044d c003                      	RJMP REVISAR_PC2
+00044e ff01                      	SBRS r16, 1
+00044f 9330 010c                 	STS hh_dec_ev, r19
                                  
                                  	REVISAR_PC2:		
                                  
-0002a8 ff22                      	SBRS R18, 2					;PC2 correspondiente al incrmento de minutos 
-0002a9 c003                          RJMP REVISAR_PC3
-0002aa ff02                          SBRS R16, 2
-0002ab 9330 010d                     STS  mm_inc_ev, R19		
+000451 ff22                      	SBRS R18, 2					;PC2 correspondiente al incrmento de minutos 
+000452 c003                          RJMP REVISAR_PC3
+000453 ff02                          SBRS R16, 2
+000454 9330 010d                     STS  mm_inc_ev, R19		
                                  
                                  	REVISAR_PC3:
                                  
-0002ad ff23                      	SBRS R18, 3					;PC3 correspondiente al decremento de minutos 
-0002ae c003                          RJMP PCINT_YA
-0002af ff03                          SBRS R16, 3
-0002b0 9330 010e                     STS  mm_dec_ev, R19
+000456 ff23                      	SBRS R18, 3					;PC3 correspondiente al decremento de minutos 
+000457 c003                          RJMP PCINT_YA
+000458 ff03                          SBRS R16, 3
+000459 9330 010e                     STS  mm_dec_ev, R19
                                  
                                  	PCINT_YA:	
-0002b2 913f                          POP  R19
-0002b3 912f                          POP  R18
-0002b4 911f                          POP  R17
-0002b5 910f                          POP  R16
-0002b6 9518                      RETI
+00045b 913f                          POP  R19
+00045c 912f                          POP  R18
+00045d 911f                          POP  R17
+00045e 910f                          POP  R16
+00045f 9518                      RETI
+                                 
+                                 
+                                 
+                                 ;Interrupcion del timer_0 para parpadear leds
+                                 ISR_TM0_COMPA:
+000460 930f                      	PUSH r16
+000461 b70f                      	IN   r16, SREG
+000462 930f                          PUSH r16
+000463 931f                          PUSH r17
+                                 
+000464 9100 011e                     LDS r16, parpadeo_led
+000466 9503                          INC r16
+000467 9300 011e                     STS parpadeo_led, r16
+                                 
+000469 3302                          CPI r16, 50
+00046a f040                          BRLO FIN_ISR_T0
+                                 
+00046b e000                          LDI r16, 0
+00046c 9300 011e                     STS parpadeo_led, r16
+                                 
+                                     
+00046e 9945                      	SBIC PORTC, PORTC5
+00046f c002                      	RJMP APAGAR_LED_T0
+000470 9a45                      	SBI  PORTC, PORTC5
+000471 c001                      	RJMP FIN_ISR_T0
+                                 
+                                 	APAGAR_LED_T0:
+000472 9845                      	CBI  PORTC, PORTC5
+                                 	FIN_ISR_T0:
+000473 911f                          POP  r17
+000474 910f                          POP  r16
+000475 bf0f                          OUT  SREG, r16
+000476 910f                          POP  r16
+000477 9518                          RETI
                                  /****************************************/
                                  
                                  
@@ -1721,7 +2336,7 @@ counted separately from r26..r31 here.
 "ATmega328P" register use summary:
 x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16: 143 r17:  14 r18:   9 r19:   8 r20:   2 
+r13:   0 r14:   0 r15:   0 r16: 316 r17:  40 r18:  30 r19:   8 r20:   2 
 r21:   0 r22:   0 r23:   0 r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   0 r31:   0 
 Registers used: 5 out of 35 (14.3%)
@@ -1729,30 +2344,30 @@ Registers used: 5 out of 35 (14.3%)
 "ATmega328P" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :  15 brge  :   0 brhc  :   0 
-brhs  :   0 brid  :   0 brie  :   0 brlo  :   8 brlt  :   0 brmi  :   0 
-brne  :   9 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :  28 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   1 cln   :   0 clr   :   2 cls   :   0 
-clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
-cpi   :  31 cpse  :   0 dec   :   3 eor   :   1 fmul  :   0 fmuls :   0 
-fmulsu:   0 icall :   0 ijmp  :   0 in    :   2 inc   :   8 jmp   :   0 
-ld    :   0 ldd   :   0 ldi   :  29 lds   :  22 lpm   :   0 lsl   :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :  27 brge  :   0 brhc  :   0 
+brhs  :   0 brid  :   0 brie  :   0 brlo  :  21 brlt  :   0 brmi  :   0 
+brne  :  24 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :  43 cbr   :   0 
+clc   :   0 clh   :   0 cli   :   1 cln   :   0 clr   :   6 cls   :   0 
+clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   5 cpc   :   0 
+cpi   :  64 cpse  :   0 dec   :   7 eor   :   1 fmul  :   0 fmuls :   0 
+fmulsu:   0 icall :   0 ijmp  :   0 in    :   3 inc   :  19 jmp   :   0 
+ld    :   0 ldd   :   0 ldi   :  63 lds   :  63 lpm   :   0 lsl   :   0 
 lsr   :   0 mov   :   1 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   2 pop   :   5 
-push  :   5 rcall :  20 ret   :  16 reti  :   2 rjmp  :  25 rol   :   0 
-ror   :   0 sbc   :   0 sbci  :   0 sbi   :  70 sbic  :   0 sbis  :   0 
+neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   6 pop   :  24 
+push  :  20 rcall :  72 ret   :  34 reti  :   3 rjmp  :  41 rol   :   0 
+ror   :   0 sbc   :   0 sbci  :   0 sbi   :  81 sbic  :   1 sbis  :   0 
 sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :  10 sec   :   0 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
-sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :  51 
-sub   :   0 subi  :   2 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 26 out of 113 (23.0%)
+sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :  91 
+sub   :   0 subi  :   6 swap  :   0 tst   :   0 wdr   :   0 
+Instructions used: 28 out of 113 (24.8%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00056e    884      0    884   32768   2.7%
-[.dseg] 0x000100 0x000111      0     17     17    2048   0.8%
+[.cseg] 0x000000 0x0008f0   1784      0   1784   32768   5.4%
+[.dseg] 0x000100 0x00011f      0     31     31    2048   1.5%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
 Assembly complete, 0 errors, 0 warnings
